@@ -47,7 +47,7 @@ export interface BuildOptions extends BaseBuildProps {
 }
 
 /**
- * Build with Parcel
+ * Build with Cross
  */
 export function build(options: BuildOptions): void {
     try {
