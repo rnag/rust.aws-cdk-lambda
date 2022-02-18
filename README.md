@@ -24,11 +24,14 @@ This library provides a construct for a Rust Lambda function.
 It uses [`cross`] for building Rust code, and follows best practices as outlined
 in the [official AWS documentation].
 
+[`cross`]: https://github.com/rust-embedded/cross
+[official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
+
+## Examples
+
 For sample CDK apps, check out the [cdk-examples/] directory in the project repo on GitHub.
 
 [cdk-examples/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples
-[`cross`]: https://github.com/rust-embedded/cross
-[official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
 
 ## Rust Function
 
