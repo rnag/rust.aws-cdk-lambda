@@ -1,13 +1,12 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
-import * as toml from 'toml';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
+import * as toml from 'toml';
+import { Settings } from '.';
 import { BaseBuildProps, build } from './build';
-
-const DEFAULT_TARGET = 'x86_64-unknown-linux-musl';
 
 /**
  * Properties for a RustFunction
@@ -60,11 +59,9 @@ export class RustFunction extends lambda.Function {
         id: string,
         props: RustFunctionProps
     ) {
-        const entry = props.directory || process.cwd();
+        const entry = props.directory || Settings.ENTRY;
         const handler = 'does.not.matter';
-        // Custom Runtime, running on `Amazon Linux 2`
-        const runtime = lambda.Runtime.PROVIDED_AL2;
-        const target = props.target || DEFAULT_TARGET;
+        const target = props.target || Settings.TARGET;
         const buildDir = props.buildDir || path.join(entry, '.build');
 
         let executable: string;
@@ -104,7 +101,7 @@ export class RustFunction extends lambda.Function {
 
         super(scope, id, {
             ...props,
-            runtime,
+            runtime: Settings.RUNTIME,
             code: lambda.Code.fromAsset(handlerDir),
             handler: handler,
         });

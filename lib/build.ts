@@ -1,6 +1,10 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { Settings } from '.';
+
+let _builtWorkspaces = false,
+    _builtBinaries = false;
 
 export interface BaseBuildProps {
     /**
@@ -48,37 +52,61 @@ export interface BuildOptions extends BaseBuildProps {
 export function build(options: BuildOptions): void {
     try {
         let outputName: string;
-        let extra_args: string[];
+        let shouldCompile: boolean;
+        let extra_args: string[] | undefined;
 
         // Build binary
         if (options.bin) {
             outputName = options.bin!;
-            extra_args = ['--bin', outputName];
+            if (_builtBinaries) {
+                shouldCompile = false;
+                extra_args = undefined;
+            } else if (Settings.BUILD_INDIVIDUALLY) {
+                shouldCompile = true;
+                extra_args = ['--bin', outputName];
+            } else {
+                _builtBinaries = true;
+                shouldCompile = true;
+                extra_args = ['--bins'];
+            }
         }
+
         // Build package - i.e. workspace member
         else {
             outputName = options.package!;
-            extra_args = ['--package', outputName];
+            if (_builtWorkspaces) {
+                shouldCompile = false;
+                extra_args = undefined;
+            } else if (Settings.BUILD_INDIVIDUALLY) {
+                shouldCompile = true;
+                extra_args = ['--package', outputName];
+            } else {
+                _builtWorkspaces = true;
+                shouldCompile = true;
+                extra_args = ['--workspace'];
+            }
         }
 
-        const args: string[] = [
-            'build',
-            '--release',
-            '--target',
-            options.target,
-            ...extra_args,
-        ];
+        if (shouldCompile) {
+            const args: string[] = [
+                'build',
+                '--release',
+                '--target',
+                options.target,
+                ...extra_args!,
+            ];
 
-        const cross = spawnSync('cross', args, {
-            cwd: options.entry,
-        });
+            const cross = spawnSync('cross', args, {
+                cwd: options.entry,
+            });
 
-        if (cross.error) {
-            throw cross.error;
-        }
+            if (cross.error) {
+                throw cross.error;
+            }
 
-        if (cross.status !== 0) {
-            throw new Error(cross.stderr.toString().trim());
+            if (cross.status !== 0) {
+                throw new Error(cross.stderr.toString().trim());
+            }
         }
 
         let from = path.join(
