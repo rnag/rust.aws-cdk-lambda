@@ -36,6 +36,12 @@ export interface RustFunctionProps
      * @default - `.cache` in the root directory
      */
     readonly cacheDir?: string;
+
+    /**
+     * Determines whether we want to set up library logging - i.e. set the
+     * `RUST_LOG` environment variable - for the lambda function.
+     */
+    readonly setupLogging?: boolean;
 }
 
 /**
@@ -99,11 +105,24 @@ export class RustFunction extends lambda.Function {
 
         logTime(start, `🎯  Cross-compile \`${executable}\``);
 
+        let lambdaEnv = props.environment;
+        // Sets up logging if needed.
+        //   Ref: https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html
+        if (props.setupLogging) {
+            lambdaEnv = lambdaEnv || {};
+            // Need to use the *underscore*- separated variant, which is
+            // coincidentally how Rust imports are done.
+            let underscoredName = executable.split('-').join('_');
+            // Set the `RUST_LOG` environment variable.
+            lambdaEnv.RUST_LOG = `${underscoredName}=trace`;
+        }
+
         super(scope, id, {
             ...props,
             runtime: Settings.RUNTIME,
             code: lambda.Code.fromAsset(handlerDir),
             handler: handler,
+            environment: lambdaEnv,
         });
     }
 }
