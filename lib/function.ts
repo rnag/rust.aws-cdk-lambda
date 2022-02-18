@@ -62,7 +62,7 @@ export class RustFunction extends lambda.Function {
         const entry = props.directory || Settings.ENTRY;
         const handler = 'does.not.matter';
         const target = props.target || Settings.TARGET;
-        const buildDir = props.buildDir || path.join(entry, '.build');
+        const buildDir = props.buildDir || Settings.BUILD_DIR;
 
         let executable: string;
         let binName: string | undefined;

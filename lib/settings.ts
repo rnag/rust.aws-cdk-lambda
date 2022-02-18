@@ -12,6 +12,11 @@ export const Settings = {
      */
     ENTRY: process.cwd(),
     /**
+     * Default Build directory, which defaults to a `.build` folder under the
+     * project's root directory.
+     */
+    BUILD_DIR: path.join(process.cwd(), '.build'),
+    /**
      * Build target to cross-compile to. Defaults to the target for Amazon
      * Linux 2, as recommended in the [official AWS documentation].
      *
