@@ -11,11 +11,13 @@ export const Settings = {
      * the directory where Cargo files are located.
      */
     ENTRY: process.cwd(),
+
     /**
      * Default Build directory, which defaults to a `.build` folder under the
      * project's root directory.
      */
     BUILD_DIR: path.join(process.cwd(), '.build'),
+
     /**
      * Build target to cross-compile to. Defaults to the target for Amazon
      * Linux 2, as recommended in the [official AWS documentation].
@@ -23,10 +25,12 @@ export const Settings = {
      * [official AWS documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
      */
     TARGET: 'x86_64-unknown-linux-musl',
+
     /**
      * Custom Lambda Runtime, running on `Amazon Linux 2`
      */
     RUNTIME: lambda.Runtime.PROVIDED_AL2,
+
     /**
      * Whether to build each executable individually, either via `--bin` or
      * `--package`.
@@ -36,6 +40,7 @@ export const Settings = {
      * efficient approach.
      */
     BUILD_INDIVIDUALLY: false,
+
     /**
      * Sets the root workspace directory. By default, the workspace directory
      * is assumed to be the directory where `cdk` was invoked.
