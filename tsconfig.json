@@ -1,10 +1,12 @@
 {
     "compilerOptions": {
-        "target": "ES2018",
+        "target": "ES2019",
         "module": "commonjs",
-        "lib": ["es2018"],
+        "lib": ["es2020", "dom"],
         "declaration": true,
         "outDir": "./dist",
-        "strict": true
-    }
+        "strict": true,
+        "esModuleInterop": true
+    },
+    "exclude": ["test"]
 }

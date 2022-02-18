@@ -17,6 +17,7 @@ dist
 
 *.tsbuildinfo
 
+.vscode
 .editorconfig
 .eslintignore
 .eslintrc.yaml
