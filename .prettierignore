@@ -1,0 +1,6 @@
+# Typescript artifacts:
+dist
+out
+
+# Miscellaneous files:
+.DS_Store

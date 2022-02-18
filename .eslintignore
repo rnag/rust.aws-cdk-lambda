@@ -1,0 +1,10 @@
+# Javascript generated files:
+**/*.js
+
+# Typescript artifacts:
+dist
+out
+
+# Miscellaneous files:
+.DS_Store
+

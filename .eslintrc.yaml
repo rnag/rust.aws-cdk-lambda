@@ -1,0 +1,25 @@
+parser: '@typescript-eslint/parser'
+extends:
+    [
+        'plugin:@typescript-eslint/recommended',
+        'eslint:recommended',
+        'prettier',
+    ]
+env:
+    es6: true
+    node: true
+    jest: true
+rules:
+    prettier/prettier: error
+    no-unused-vars: 'off'
+    '@typescript-eslint/no-unused-vars':
+        - 'warn'
+        - argsIgnorePattern: '^_'
+          varsIgnorePattern: '^_'
+          caughtErrorsIgnorePattern: '^_'
+    '@typescript-eslint/no-explicit-any': 'off'
+    '@typescript-eslint/no-inferrable-types': 'off'
+    '@typescript-eslint/no-non-null-assertion': 'off'
+    '@typescript-eslint/indent': ['error', 4]
+plugins:
+    - prettier
