@@ -24,6 +24,9 @@ This library provides a construct for a Rust Lambda function.
 It uses [`cross`] for building Rust code, and follows best practices as outlined
 in the [official AWS documentation].
 
+For sample CDK apps, check out the [cdk-examples/] directory in the project repo on GitHub.
+
+[cdk-examples/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples
 [`cross`]: https://github.com/rust-embedded/cross
 [official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
 
@@ -79,14 +82,12 @@ Suppose your project layout looks like this:
 Here's one way to deploy that:
 
 ```
-const bin1 = "lambda1";
-new RustFunction(this, bin1, {
-    bin: bin1,
+new RustFunction(this, "my-function-1", {
+    bin: "lambda1",
 });
 
-const bin2 = "lambda2";
-new RustFunction(this, bin2, {
-    bin: bin2,
+new RustFunction(this, "my-function-2", {
+    bin: "lambda2",
 });
 ```
 
@@ -130,14 +131,12 @@ Now you will only need to update your CDK code to pass `package` instead,
 for each workspace member:
 
 ```
-const package1 = "lambda1";
-new RustFunction(this, package1, {
-    package: package1,
+new RustFunction(this, "MyFirstRustFunction", {
+    package: "lambda1",
 });
 
-const package2 = "lambda2";
-new RustFunction(this, package2, {
-    package: package2,
+new RustFunction(this, "MySecondRustFunction", {
+    package: "lambda2",
 });
 ```
 
