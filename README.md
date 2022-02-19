@@ -102,7 +102,7 @@ that you can use to deploy with `cdk`.
 
 Suppose your project layout looks like this:
 
-```
+```plaintext
 .
 ├── Cargo.toml
 └── src
@@ -113,15 +113,19 @@ Suppose your project layout looks like this:
 
 Here's one way to deploy that:
 
-```
-new RustFunction(this, "my-function-1", {
-    bin: "lambda1",
+```ts
+new RustFunction(this, 'my-function-1', {
+    bin: 'lambda1',
 });
 
-new RustFunction(this, "my-function-2", {
-    bin: "lambda2",
+new RustFunction(this, 'my-function-2', {
+    bin: 'lambda2',
 });
 ```
+
+You can find a more complete project structure in the [rust-bins/] CDK sample project.
+
+[rust-bins/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-bins
 
 ### Multiple Packages
 
@@ -130,7 +134,7 @@ Suppose you use [Workspaces] in your Cargo project instead.
 The full contents of the main `Cargo.toml` would need to be updated
 to look like this:
 
-```
+```toml
 [workspace]
 members = [
     "lambda1",
@@ -140,7 +144,7 @@ members = [
 
 And your new project layout would now look similar to this:
 
-```
+```plaintext
 .
 ├── Cargo.lock
 ├── Cargo.toml
@@ -156,20 +160,22 @@ And your new project layout would now look similar to this:
         └── utils.rs
 ```
 
-Where the `utils.rs` files are optional, but the point being that they can be imported
-by the lambda handlers in `main.rs` if desired.
+Where the `utils.rs` files are optional, but the point is that they can be imported by the lambda handler code in `main.rs` if desired.
 
 Now you will only need to update your CDK code to pass `package` instead,
 for each workspace member:
 
-```
-new RustFunction(this, "MyFirstRustFunction", {
-    package: "lambda1",
+```ts
+new RustFunction(this, 'MyFirstRustFunction', {
+    package: 'lambda1',
 });
 
-new RustFunction(this, "MySecondRustFunction", {
-    package: "lambda2",
+new RustFunction(this, 'MySecondRustFunction', {
+    package: 'lambda2',
 });
 ```
+
+You can find a more complete project structure in the [rust-workspaces/] CDK sample project.
 
 [workspaces]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
+[rust-workspaces/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-workspaces
