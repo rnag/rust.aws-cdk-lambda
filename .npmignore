@@ -23,6 +23,7 @@ dist
 .eslintrc.yaml
 .prettierignore
 .prettierrc.yaml
+.gitattributes
 tsconfig.json
 jest.config.js
 
