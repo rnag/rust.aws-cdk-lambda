@@ -31,7 +31,6 @@ in the [official AWS documentation].
 ## Rust Fuction
 
 The `RustFunction` construct creates a Lambda function with automatic bundling and compilation of Rust code.
-
 It uses [Docker] and [`cross`] under the hood.
 
 ## Examples
