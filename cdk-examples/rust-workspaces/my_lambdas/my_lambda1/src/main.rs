@@ -72,7 +72,7 @@ pub(crate) async fn my_handler(event: Request, ctx: Context) -> Response {
     // prepare the response
     let resp = SuccessResponse {
         req_id: ctx.request_id,
-        msg: format!("Hello from Lambda 1111! The command {} executed.", command),
+        msg: format!("Hello from Lambda 1! The command {} executed.", command),
     };
 
     // return `Response` (it will be serialized to JSON automatically by the runtime)
