@@ -203,7 +203,7 @@ import { Settings } from 'rust.aws-cdk-lambda';
 
 Below are some useful _global_ defaults which can be set for all Rust Lambda Functions in a CDK app.
 
-| name                 | description                                                                                                                                                                                                                                 |
+| Name                 | Description                                                                                                                                                                                                                                 |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `BUILD_INDIVIDUALLY` | Whether to build each executable individually, either via `--bin` or `--package`.                                                                                                                                                           |
 | `workspace_dir`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
