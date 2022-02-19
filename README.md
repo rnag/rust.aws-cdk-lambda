@@ -179,3 +179,31 @@ You can find a more complete project structure in the [rust-workspaces/] CDK sam
 
 [workspaces]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
 [rust-workspaces/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-workspaces
+
+## Rust Function Properties
+
+Below lists some commonly used properties you can pass in to the `RustFunction` construct.
+
+| Name           | Description                                                                                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`       | Build target to cross-compile to. Defaults to the target for Linux MUSL, `x86_64-unknown-linux-musl`.                                                                                                                           |
+| `directory`    | Entry point where the project's main `Cargo.toml` is located. By default, the construct will use directory where `cdk` was invoked as the directory where Cargo files are located.                                              |
+| `buildDir`     | Default Build directory, which defaults to a `.build` folder under the project's root directory.                                                                                                                                |
+| `bin`          | Executable name to pass to `--bin`                                                                                                                                                                                              |
+| `package`      | Workspace package name to pass to `--package`                                                                                                                                                                                   |
+| `setupLogging` | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function. |
+
+## Settings
+
+Settings can be imported as follows:
+
+```ts
+import { Settings } from 'rust.aws-cdk-lambda';
+```
+
+Below are some useful _global_ defaults which can be set for all Rust Lambda Functions in a CDK app.
+
+| name                 | description                                                                                                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BUILD_INDIVIDUALLY` | Whether to build each executable individually, either via `--bin` or `--package`.                                                                                                                                                           |
+| `workspace_dir`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
