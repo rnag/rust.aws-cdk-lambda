@@ -9,7 +9,7 @@ export class RustBinsStack extends Stack {
         super(scope, id, props);
 
         // Uncomment if you want to build (e.g. cross-compile) each target, or
-        // workspace member, individually.
+        // binary, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
 
         const bucket = new s3.Bucket(this, 'RustBinsBucket', {
@@ -18,7 +18,7 @@ export class RustBinsStack extends Stack {
         });
 
         let myLambda1 = new RustFunction(this, 'MyRustLambda1', {
-            package: 'my_lambda1',
+            bin: 'my_lambda1',
             // Useful so library logs show up in CloudWatch
             setupLogging: true,
             environment: {
@@ -30,7 +30,7 @@ export class RustBinsStack extends Stack {
         bucket.grantReadWrite(myLambda1);
 
         let _myLambda2 = new RustFunction(this, 'MyRustLambda2', {
-            package: 'my_lambda2',
+            bin: 'my_lambda2',
             setupLogging: true,
         });
     }
