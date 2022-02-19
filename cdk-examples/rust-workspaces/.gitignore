@@ -11,4 +11,4 @@ cdk.out
 .build
 
 # Added by cargo
-/target
+target
