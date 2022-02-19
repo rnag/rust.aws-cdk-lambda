@@ -1,5 +1,5 @@
 import { RustFunction } from '../lib';
 
-test('It works', () => {
-    console.log('success');
+test('It works!', () => {
+    console.log('Success!');
 });

@@ -4,7 +4,7 @@
 
 ---
 
-![Stability: Experimental](https://img.shields.io/badge/stability-Experimental-important.svg?style=for-the-badge)
+![rust.aws-cdk-lambda: Stable](https://img.shields.io/badge/rust.aws--cdk--lambda-stable-success.svg?style=for-the-badge)
 [![npm](https://img.shields.io/npm/v/rust.aws-cdk-lambda?style=for-the-badge)](https://www.npmjs.com/package/rust.aws-cdk-lambda)
 
 > **This is unofficial CDK library based on the [Amazon Lambda Node.js] and [aws-lambda-rust] Libraries.**
@@ -21,13 +21,48 @@
 
 This library provides a construct for a Rust Lambda function.
 
-It uses [`cross`] for building Rust code, and follows best practices as outlined
+It uses [Docker] and [`cross`] under the hood, and follows best practices as outlined
 in the [official AWS documentation].
 
+[docker]: https://www.docker.com/get-started
 [`cross`]: https://github.com/rust-embedded/cross
 [official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
 
-## Rust Function
+## Rust Fuction
+
+The `RustFunction` construct creates a Lambda function with automatic bundling and compilation of Rust code.
+
+## Examples
+
+You can find sample CDK apps built using _Typescript_ or _Node.js_ in the [cdk-examples/] folder of the GitHub project repo.
+
+[cdk-examples/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples
+
+## Getting Started
+
+1. Install the [npm](https://nodejs.org/) package:
+
+    ```shell
+    $ npm i rust.aws-cdk-lambda
+    ```
+
+2) Use [`cargo`] to install _rust-embedded/cross_:
+
+    ```shell
+    $ cargo install cross
+    ```
+
+3. Install the **x86_64-unknown-linux-musl** toolchain with Rustup by running:
+
+    ```shell
+    $ rustup target add x86_64-unknown-linux-musl
+    ```
+
+Finally, ensure you have [Docker] installed and running, as it will be used by `cross` to compile Rust code for deployment.
+
+[`cargo`]: https://www.rust-lang.org/
+
+## Usage
 
 First, import the construct:
 
@@ -43,7 +78,7 @@ new RustFunction(this, 'my-handler', {});
 
 By default, the construct will use directory where `cdk` was invoked as directory where Cargo files are located.
 
-If no `bin` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
+If no `bin` or `package` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
 
 Alternatively, `directory` and `bin` can be specified:
 
@@ -67,7 +102,7 @@ that you can use to deploy with `cdk`.
 
 Suppose your project layout looks like this:
 
-```
+```plaintext
 .
 ├── Cargo.toml
 └── src
@@ -78,17 +113,19 @@ Suppose your project layout looks like this:
 
 Here's one way to deploy that:
 
-```
-const bin1 = "lambda1";
-new RustFunction(this, bin1, {
-    bin: bin1,
+```ts
+new RustFunction(this, 'my-function-1', {
+    bin: 'lambda1',
 });
 
-const bin2 = "lambda2";
-new RustFunction(this, bin2, {
-    bin: bin2,
+new RustFunction(this, 'my-function-2', {
+    bin: 'lambda2',
 });
 ```
+
+You can find a more complete project structure in the [rust-bins/] CDK sample project.
+
+[rust-bins/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-bins
 
 ### Multiple Packages
 
@@ -97,7 +134,7 @@ Suppose you use [Workspaces] in your Cargo project instead.
 The full contents of the main `Cargo.toml` would need to be updated
 to look like this:
 
-```
+```toml
 [workspace]
 members = [
     "lambda1",
@@ -107,7 +144,7 @@ members = [
 
 And your new project layout would now look similar to this:
 
-```
+```plaintext
 .
 ├── Cargo.lock
 ├── Cargo.toml
@@ -123,22 +160,50 @@ And your new project layout would now look similar to this:
         └── utils.rs
 ```
 
-Where the `utils.rs` files are optional, but the point being that they can be imported
-by the lambda handlers in `main.rs` if desired.
+Where the `utils.rs` files are optional, but the point is that they can be imported by the lambda handler code in `main.rs` if desired.
 
 Now you will only need to update your CDK code to pass `package` instead,
 for each workspace member:
 
-```
-const package1 = "lambda1";
-new RustFunction(this, package1, {
-    package: package1,
+```ts
+new RustFunction(this, 'MyFirstRustFunction', {
+    package: 'lambda1',
 });
 
-const package2 = "lambda2";
-new RustFunction(this, package2, {
-    package: package2,
+new RustFunction(this, 'MySecondRustFunction', {
+    package: 'lambda2',
 });
 ```
+
+You can find a more complete project structure in the [rust-workspaces/] CDK sample project.
 
 [workspaces]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
+[rust-workspaces/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-workspaces
+
+## Rust Function Properties
+
+Below lists some commonly used properties you can pass in to the `RustFunction` construct.
+
+| Name           | Description                                                                                                                                                                                                                     |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`       | Build target to cross-compile to. Defaults to the target for Linux MUSL, `x86_64-unknown-linux-musl`.                                                                                                                           |
+| `directory`    | Entry point where the project's main `Cargo.toml` is located. By default, the construct will use directory where `cdk` was invoked as the directory where Cargo files are located.                                              |
+| `buildDir`     | Default Build directory, which defaults to a `.build` folder under the project's root directory.                                                                                                                                |
+| `bin`          | Executable name to pass to `--bin`                                                                                                                                                                                              |
+| `package`      | Workspace package name to pass to `--package`                                                                                                                                                                                   |
+| `setupLogging` | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function. |
+
+## Settings
+
+Settings can be imported as follows:
+
+```ts
+import { Settings } from 'rust.aws-cdk-lambda';
+```
+
+Below are some useful _global_ defaults which can be set for all Rust Lambda Functions in a CDK app.
+
+| Name                 | Description                                                                                                                                                                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BUILD_INDIVIDUALLY` | Whether to build each executable individually, either via `--bin` or `--package`.                                                                                                                                                           |
+| `workspace_dir`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |

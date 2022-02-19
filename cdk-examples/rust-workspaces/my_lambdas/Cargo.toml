@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "my_lambda1",
+    "my_lambda2",
+    "shared",
+]
