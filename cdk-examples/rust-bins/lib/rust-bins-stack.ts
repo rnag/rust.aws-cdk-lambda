@@ -4,18 +4,15 @@ import { BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { RustFunction, Settings } from '../../../lib';
 
-export class RustWorkspacesStack extends Stack {
+export class RustBinsStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
-
-        // Set the base Cargo workspace directory
-        Settings.workspace_dir = 'my_lambdas';
 
         // Uncomment if you want to build (e.g. cross-compile) each target, or
         // workspace member, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
 
-        const bucket = new s3.Bucket(this, 'RustWorkspacesBucket', {
+        const bucket = new s3.Bucket(this, 'RustBinsBucket', {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             publicReadAccess: false,
         });

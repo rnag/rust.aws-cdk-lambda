@@ -1,6 +1,6 @@
 # Welcome to your CDK TypeScript project!
 
-A CDK app which demonstrates a sample project with multiple Rust workspace members, each deployed as an AWS Lambda function.
+A CDK app which demonstrates a sample project with multiple Rust binaries, each deployed as an AWS Lambda function.
 
 This stack sets up an S3 bucket with permissions locked down by default, and an AWS Lambda Function which saves the request (input) as a text file in the bucket.
 
@@ -16,7 +16,7 @@ The Lambdas requires an input with a `command` key, such as the following exampl
 
 ---
 
-You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`RustWorkspacesStack`)
+You should explore the contents of this project. It demonstrates a CDK app with an instance of a stack (`RustBinsStack`)
 which contains an Amazon SQS queue that is subscribed to an Amazon SNS topic.
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
