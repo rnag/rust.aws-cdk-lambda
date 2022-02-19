@@ -88,6 +88,9 @@ export function build(options: BuildOptions): void {
         }
 
         if (shouldCompile) {
+            console.log(
+                `🍺  Building Rust code with \`cross\`. This may take a few minutes...`
+            );
             const args: string[] = [
                 'build',
                 '--release',
