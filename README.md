@@ -4,7 +4,7 @@
 
 ---
 
-![Stability: Experimental](https://img.shields.io/badge/stability-Experimental-important.svg?style=for-the-badge)
+![rust.aws-cdk-lambda: Stable](https://img.shields.io/badge/rust.aws--cdk--lambda-stable-success.svg?style=for-the-badge)
 [![npm](https://img.shields.io/npm/v/rust.aws-cdk-lambda?style=for-the-badge)](https://www.npmjs.com/package/rust.aws-cdk-lambda)
 
 > **This is unofficial CDK library based on the [Amazon Lambda Node.js] and [aws-lambda-rust] Libraries.**
@@ -24,16 +24,47 @@ This library provides a construct for a Rust Lambda function.
 It uses [`cross`] for building Rust code, and follows best practices as outlined
 in the [official AWS documentation].
 
+[docker]: https://www.docker.com/get-started
 [`cross`]: https://github.com/rust-embedded/cross
 [official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
 
+## Rust Fuction
+
+The `RustFunction` construct creates a Lambda function with automatic bundling and compilation of Rust code.
+
+It uses [Docker] and [`cross`] under the hood.
+
 ## Examples
 
-For sample CDK apps, check out the [cdk-examples/] directory in the project repo on GitHub.
+You can find sample CDK apps built using _Typescript_ or _Node.js_ in the [cdk-examples/] folder of the GitHub project repo.
 
 [cdk-examples/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples
 
-## Rust Function
+## Getting Started
+
+1. Install the [npm](https://nodejs.org/) package:
+
+    ```shell
+    $ npm i rust.aws-cdk-lambda
+    ```
+
+2) Use [`cargo`] to install _rust-embedded/cross_:
+
+    ```shell
+    $ cargo install cross
+    ```
+
+3. Install the **x86_64-unknown-linux-musl** toolchain with Rustup by running:
+
+    ```shell
+    $ rustup target add x86_64-unknown-linux-musl
+    ```
+
+Finally, ensure you have [Docker] installed and running, as it will be used by `cross` to compile Rust code for deployment.
+
+[`cargo`]: https://www.rust-lang.org/
+
+## Usage
 
 First, import the construct:
 
@@ -49,7 +80,7 @@ new RustFunction(this, 'my-handler', {});
 
 By default, the construct will use directory where `cdk` was invoked as directory where Cargo files are located.
 
-If no `bin` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
+If no `bin` or `package` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
 
 Alternatively, `directory` and `bin` can be specified:
 
