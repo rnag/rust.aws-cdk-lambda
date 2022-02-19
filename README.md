@@ -21,7 +21,7 @@
 
 This library provides a construct for a Rust Lambda function.
 
-It uses [`cross`] for building Rust code, and follows best practices as outlined
+It uses [Docker] and [`cross`] under the hood, and follows best practices as outlined
 in the [official AWS documentation].
 
 [docker]: https://www.docker.com/get-started
@@ -31,7 +31,6 @@ in the [official AWS documentation].
 ## Rust Fuction
 
 The `RustFunction` construct creates a Lambda function with automatic bundling and compilation of Rust code.
-It uses [Docker] and [`cross`] under the hood.
 
 ## Examples
 
