@@ -1,10 +1,10 @@
 // This example requires the following input to succeed:
 // { "command": "do something" }
 mod models;
-mod utils;
 
 use models::*;
-use utils::setup_logging;
+use rust_bins::systems::*;
+use rust_bins::*;
 
 use std::time::Instant;
 
@@ -17,6 +17,9 @@ type Response = Result<SuccessResponse>;
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     setup_logging();
+
+    system_a::do_stuff_from_system_a();
+    system_b::do_stuff_from_system_b();
 
     let start = Instant::now();
     let func = handler_fn(my_handler);
@@ -107,7 +110,7 @@ pub(crate) async fn my_handler(event: Request, ctx: LambdaContext) -> Response {
     // prepare the response
     let resp = SuccessResponse {
         req_id: ctx.request_id,
-        msg: format!("Hello from Lambda 2! The command {} executed.", command),
+        msg: format!("Hello from Lambda 22! The command {} executed.", command),
     };
 
     // return `Response` (it will be serialized to JSON automatically by the runtime)

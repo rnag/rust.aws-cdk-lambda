@@ -862,6 +862,7 @@ dependencies = [
  "log",
  "serde",
  "serde_json",
+ "shared",
  "time",
  "tokio",
  "tracing",
@@ -878,6 +879,7 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_json",
+ "shared",
  "tokio",
  "tracing",
  "tracing-subscriber 0.3.9",
@@ -1287,6 +1289,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "900fba806f70c630b0a382d0d825e17a0f19fcd059a2ade1ff237bcddf446b31"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "tracing",
+ "tracing-subscriber 0.3.9",
 ]
 
 [[package]]
