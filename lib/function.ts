@@ -94,7 +94,7 @@ export class RustFunction extends lambda.Function {
 
         let start = performance.now();
 
-        // Build with Parcel
+        // Build with `cross`
         build({
             entry,
             bin: binName,
