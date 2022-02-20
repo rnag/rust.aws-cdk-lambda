@@ -19,6 +19,8 @@ npm i
 
 Next, ensure that you have [Docker](https://www.docker.com/get-started) running. You will need this to deploy with [`cross`](https://github.com/cross-rs/cross).
 
+If you don't have `cross` installed, check out the [Getting Started](https://github.com/rnag/rust.aws-cdk-lambda#getting-started) section in the docs for more info on getting set up.
+
 Now you can deploy the app with `cdk`:
 
 > Note: on an initial run, it may take a _really_ long time on the compilation step with `cross`. In my case, it sometimes took up to _12 minutes_! But don't worry, any subsequent deployments should be overall faster.
