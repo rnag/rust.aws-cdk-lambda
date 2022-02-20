@@ -1,6 +1,6 @@
 # CDK Examples
 
-Contains sample CDK apps
+Contains sample CDK apps that use Rust Lambda Functions.
 
 ## Deploy
 
