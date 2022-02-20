@@ -18,7 +18,6 @@ npm i
 ```
 
 Next, ensure that you have [Docker](https://www.docker.com/get-started) running. You will need this to deploy with [`cross`](https://github.com/cross-rs/cross).
-
 If you don't have `cross` installed, check out the [Getting Started](https://github.com/rnag/rust.aws-cdk-lambda#getting-started) section in the docs for more info on getting set up.
 
 Now you can deploy the app with `cdk`:
