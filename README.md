@@ -112,7 +112,7 @@ When bundling the code, the `RustFunction` runs the following steps in order:
 
 -   Finally, it copies the release app binary from the `target/` folder to a file named `bootstrap`, which the Lambda custom runtime environment looks for. It adds this new file under the _build directory_, which defaults to a `.build/` folder under the directory where `cdk` was invoked.
 
-    The directory path to the executable is then passed in to `lambda.Code.fromAsset`, which creates a _zip file_ from the release binary asset.
+-   The directory path to the executable is then passed in to `lambda.Code.fromAsset`, which creates a _zip file_ from the release binary asset.
 
 ## Multiple Rust Lambdas
 
