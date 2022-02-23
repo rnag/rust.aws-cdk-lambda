@@ -24,10 +24,6 @@ Possible header types:
     -   `DEFAULT_LOG_LEVEL`
     -   `MODULE_LOG_LEVEL`
 
-### Bug Fixes
-
--   Ensure `examples/assets` directory isn't included when publishing the crate to _crates.io_.
-
 ## v0.2.0 (2022-02-19)
 
 ### Features
