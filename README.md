@@ -101,7 +101,7 @@ new RustFunction(this, 'MyLambdaFunction', {
 
 All other properties of `lambda.Function` are supported, see also the [AWS Lambda construct library](https://github.com/aws/aws-cdk/tree/master/packages/%40aws-cdk/aws-lambda).
 
-## How it works
+## How It Works
 
 When bundling the code, the `RustFunction` runs the following steps in order:
 
