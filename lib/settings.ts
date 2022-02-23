@@ -42,6 +42,27 @@ export const Settings = {
     BUILD_INDIVIDUALLY: false,
 
     /**
+     * True to run `cargo check` before building Rust code.
+     */
+    RUN_CARGO_CHECK: true,
+
+    /**
+     * Default Log Level, for non-module libraries.
+     *
+     * Note: this value is only used when `RustFunctionProps.setupLogging`
+     * is enabled.
+     */
+    DEFAULT_LOG_LEVEL: 'warn',
+
+    /**
+     * Default Log Level for modules (i.e. the executable)
+     *
+     * Note: this value is only used when `RustFunctionProps.setupLogging`
+     * is enabled.
+     */
+    MODULE_LOG_LEVEL: 'debug',
+
+    /**
      * Sets the root workspace directory. By default, the workspace directory
      * is assumed to be the directory where `cdk` was invoked.
      *

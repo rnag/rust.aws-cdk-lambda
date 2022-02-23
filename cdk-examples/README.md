@@ -61,3 +61,29 @@ For example, using:
 ```shell
 echo '\n# Rust lambda build directory\n.build' >> .gitignore
 ```
+
+## Local Development and Testing
+
+In case it's desirable to uncomment the following import in the `lib/` folder of a sample CDK app, for local testing purposes:
+
+```ts
+import { RustFunction, Settings } from '../../../lib';
+```
+
+You may then potentially run into some import errors when deploying the stack via `cdk`.
+
+To fix that, run this command from both the project root folder `$root`, and compare the output when running it from within `$root/cdk-examples/my-app`:
+
+```shell
+npm list
+```
+
+To resolve the import issues, you'll need to ensure that certain package versions are the same between the two directories.
+
+For example, here are the important ones you'd need to verify:
+
+```plaintext
+├── aws-cdk-lib@2.12.0
+├── aws-cdk@2.12.0
+├── constructs@10.0.65
+```
