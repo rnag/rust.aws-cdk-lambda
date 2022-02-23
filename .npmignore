@@ -35,3 +35,6 @@ test/
 
 # exclude examples
 cdk-examples
+
+# exclude changelog (can always be found on GitHub)
+CHANGELOG.md

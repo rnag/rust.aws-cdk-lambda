@@ -7,6 +7,7 @@ import { performance } from 'perf_hooks';
 import * as toml from 'toml';
 import { Settings } from '.';
 import { BaseBuildProps, build } from './build';
+import { logTime } from './utils';
 
 /**
  * Properties for a RustFunction
@@ -114,7 +115,7 @@ export class RustFunction extends lambda.Function {
             // coincidentally how Rust imports are done.
             let underscoredName = executable.split('-').join('_');
             // Set the `RUST_LOG` environment variable.
-            lambdaEnv.RUST_LOG = `${underscoredName}=trace`;
+            lambdaEnv.RUST_LOG = `${Settings.DEFAULT_LOG_LEVEL},${underscoredName}=${Settings.MODULE_LOG_LEVEL}`;
         }
 
         super(scope, id, {
@@ -131,13 +132,6 @@ function createDirectory(dir: string) {
     if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir);
     }
-}
-
-function logTime(start: number, message: string) {
-    const elapsedSec = ((performance.now() - start) / 1000).toFixed(
-        2
-    );
-    console.log(`${message}: ${elapsedSec}s`);
 }
 
 function getPackageName(entry: string) {

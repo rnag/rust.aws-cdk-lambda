@@ -1,10 +1,13 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+import { performance } from 'perf_hooks';
 import { Settings } from '.';
+import { logTime } from './utils';
 
 let _builtWorkspaces = false,
-    _builtBinaries = false;
+    _builtBinaries = false,
+    _ranCargoCheck = false;
 
 export interface BaseBuildProps {
     /**
@@ -87,10 +90,35 @@ export function build(options: BuildOptions): void {
             }
         }
 
+        let targetReleaseDir = path.join(
+            options.entry,
+            'target',
+            options.target,
+            'release'
+        );
+        const releaseDirExists = fs.existsSync(targetReleaseDir);
+
         if (shouldCompile) {
-            console.log(
-                `🍺  Building Rust code with \`cross\`. This may take a few minutes...`
-            );
+            // Run `cargo check` on an initial time, if needed
+            if (Settings.RUN_CARGO_CHECK && !_ranCargoCheck) {
+                _ranCargoCheck = true;
+                checkCode(options, releaseDirExists);
+            }
+
+            if (releaseDirExists) {
+                console.log(`🍺  Building Rust code...`);
+            } else {
+                // The `release` directory doesn't exist for the specified
+                // target. This is most likely an initial run, so `cross` will
+                // take much longer than usual to cross-compile the code.
+                //
+                // Print out an informative message that the `build` step is
+                // expected to take longer than usual.
+                console.log(
+                    `🍺  Building Rust code with \`cross\`. This may take a few minutes...`
+                );
+            }
+
             const args: string[] = [
                 'build',
                 '--release',
@@ -112,13 +140,7 @@ export function build(options: BuildOptions): void {
             }
         }
 
-        let from = path.join(
-            options.entry,
-            'target',
-            options.target,
-            'release',
-            outputName
-        );
+        let from = path.join(targetReleaseDir, outputName);
         let to = path.join(options.outDir, 'bootstrap');
 
         fs.copyFileSync(from, to);
@@ -127,4 +149,58 @@ export function build(options: BuildOptions): void {
             `Failed to build file at ${options.entry}: ${err}`
         );
     }
+}
+
+/**
+ * Validate code with `cargo check`
+ *
+ * Note: this step is optional, and can be disabled with
+ * `Settings.RUN_CARGO_CHECK` as needed.
+ */
+export function checkCode(
+    options: BuildOptions,
+    releaseDirExists: boolean
+) {
+    if (!releaseDirExists) {
+        // The `release` directory doesn't exist for the specified
+        // target. This is most likely an initial run, so `cargo` will
+        // take much longer than usual to check the code.
+        //
+        // Print out an informative message that the `validate` step is
+        // expected to take longer than usual.
+        console.log(
+            `🧪  Checking code with \`cargo\`. This may take a few minutes...`
+        );
+    }
+
+    let start = performance.now();
+
+    const args: string[] = [
+        'check',
+        '--release',
+        '--target',
+        options.target,
+        '--color',
+        'always',
+    ];
+
+    const check = spawnSync('cargo', args, {
+        cwd: options.entry,
+    });
+
+    if (check.error) {
+        throw check.error;
+    }
+
+    if (check.status !== 0) {
+        console.error(check.stderr.toString().trim());
+        console.error(`💥  Run \`cargo check\` errored.`);
+        process.exit(1);
+        // Note: I don't want to raise an error here, as that will clutter the
+        // output with the stack trace here. But maybe, there's a way to
+        // suppress that?
+        // throw new Error(check.stderr.toString().trim());
+    }
+
+    logTime(start, `✅  Run \`cargo check\``);
 }
