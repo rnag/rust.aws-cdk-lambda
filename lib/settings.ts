@@ -42,7 +42,9 @@ export const Settings = {
     BUILD_INDIVIDUALLY: false,
 
     /**
-     * True to run `cargo check` before building Rust code.
+     * Whether to run `cargo check` to validate Rust code before building it with `cross`.
+     *
+     * Defaults to true.
      */
     RUN_CARGO_CHECK: true,
 
@@ -55,7 +57,7 @@ export const Settings = {
     DEFAULT_LOG_LEVEL: 'warn',
 
     /**
-     * Default Log Level for modules (i.e. the executable)
+     * Default Log Level for a module (i.e. the executable)
      *
      * Note: this value is only used when `RustFunctionProps.setupLogging`
      * is enabled.

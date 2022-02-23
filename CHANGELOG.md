@@ -18,7 +18,7 @@ Possible header types:
 -   Add support to run `cargo check` by default before building Rust code.
 -   Clean up console log messages that get printed out so they are a bit nicer.
 -   Change the value that is set for the `RUST_LOG` environment variable when `setupLogging` is enabled.
-    -   The format is now `warn,module_name=default` instead of `module_name=trace`.
+    -   The format is now `warn,module_name=debug` instead of `module_name=trace`.
 -   Add below global _Settings_:
     -   `RUN_CARGO_CHECK`
     -   `DEFAULT_LOG_LEVEL`
