@@ -80,7 +80,7 @@ By default, the construct will use directory where `cdk` was invoked as director
 
 If no `bin` or `package` argument is passed in, it will default to the package name as defined in the main `Cargo.toml`.
 
-That is, the above syntax should work for a project structure that looks like this:
+That is, the above usage should work for a project structure that looks like this:
 
 ```plaintext
 .
