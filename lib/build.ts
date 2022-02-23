@@ -109,7 +109,7 @@ export function build(options: BuildOptions): void {
                 console.log(`🍺  Building Rust code...`);
             } else {
                 // The `release` directory doesn't exist for the specified
-                // target. This is most likely an initial run, so`cross` will
+                // target. This is most likely an initial run, so `cross` will
                 // take much longer than usual to cross-compile the code.
                 //
                 // Print out an informative message that the `build` step is
@@ -195,8 +195,10 @@ export function checkCode(
     if (check.status !== 0) {
         console.error(check.stderr.toString().trim());
         console.error(`💥  Run \`cargo check\` errored.`);
-        process.exit(-1);
-        // process.exit(-1);
+        process.exit(1);
+        // Note: I don't want to raise an error here, as that will clutter the
+        // output with the stack trace here. But maybe, there's a way to
+        // suppress that?
         // throw new Error(check.stderr.toString().trim());
     }
 
