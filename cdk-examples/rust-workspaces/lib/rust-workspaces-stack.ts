@@ -11,7 +11,7 @@ export class RustWorkspacesStack extends Stack {
         super(scope, id, props);
 
         // Set the base Cargo workspace directory
-        Settings.workspace_dir = 'my_lambdas';
+        Settings.WORKSPACE_DIR = 'my_lambdas';
 
         // Uncomment if you want to build (e.g. cross-compile) each target, or
         // workspace member, individually.

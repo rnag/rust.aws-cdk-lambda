@@ -77,7 +77,25 @@ export const Settings = {
      *   ```
      *
      */
-    set workspace_dir(folder: string) {
+    set WORKSPACE_DIR(folder: string) {
         this.ENTRY = path.join(this.ENTRY, folder);
+    },
+
+    /**
+     * Sets the root workspace directory. By default, the workspace directory
+     * is assumed to be the directory where `cdk` was invoked.
+     *
+     * This directory should contain at the minimum a `Cargo.toml` file which
+     * defines the workspace members. Sample contents of this file are shown:
+     *
+     *   ```toml
+     *   [workspace]
+     *   members = ["lambda1", "lambda2"]
+     *
+     * @deprecated Use `WORKSPACE_DIR()` instead. This will be removed
+     * in v0.5.0.
+     */
+    set workspace_dir(folder: string) {
+        this.WORKSPACE_DIR = folder;
     },
 };
