@@ -25,6 +25,11 @@ export class RustStandaloneStack extends Stack {
             },
             // Useful so library logs show up in CloudWatch
             setupLogging: true,
+            // Enable optional features and env variables at build (compile) time.
+            features: ['my-second-feature'],
+            buildEnvironment: {
+                MY_BUILD_ENV_VAR: 'Testing 123.',
+            },
         });
 
         bucket.grantReadWrite(myLambda);
