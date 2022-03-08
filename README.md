@@ -224,7 +224,7 @@ my-feature = [] # feature has no explicit dependencies
 
 In your code, add the line `#[cfg(feature="my-feature")]` before a function declaration, or before a statement to execute.
 
-In your CDK code in _Typescript_ or _Node.js_, add the following line:
+In your CDK code in the `lib/` folder, add the following line:
 
 ```ts
 // Enable features at compile or build time.
@@ -242,7 +242,7 @@ In your code, add a call to the `env!()` macro:
 let build_value = env!("MY_BUILD_VAR");
 ```
 
-In your CDK code in _Typescript_ or _Node.js_, add the following line:
+In your CDK code in the `lib/` folder, add the following line:
 
 ```ts
 // Enable environment variables at compile or build time.
