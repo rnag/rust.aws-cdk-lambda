@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
 import { Settings } from '.';
-import { logTime } from './utils';
+import { deleteFile, logTime } from './utils';
 
 let _builtWorkspaces = false,
     _builtBinaries = false,
@@ -26,9 +26,37 @@ export interface BaseBuildProps {
      * Normally you'll need to first add the target to your toolchain:
      *    $ rustup target add <target>
      *
-     * The target defaults to `x86_64-unknown-linux-musl` if not passed.
+     * The target defaults to `x86_64-unknown-linux-gnu` if not passed.
      */
     readonly target?: string;
+
+    /**
+     * A list of features to activate when compiling Rust code.
+     */
+    readonly features?: string[];
+
+    /**
+     * Key-value pairs that are passed in at compile time, i.e. to `cargo
+     * build` or `cross build`.
+     *
+     * Use environment variables to apply configuration changes, such
+     * as test and production environment configurations, without changing your
+     * Lambda function source code.
+     *
+     * @default - No environment variables.
+     */
+    readonly buildEnvironment?: NodeJS.ProcessEnv;
+
+    /**
+     * Additional arguments that are passed in at build time to both
+     * `cargo check` and `cross build`.
+     *
+     * ## Examples
+     *
+     * - `--all-features`
+     * - `--no-default-features`
+     */
+    readonly extraBuildArgs?: string[];
 }
 
 /**
@@ -99,10 +127,36 @@ export function build(options: BuildOptions): void {
         const releaseDirExists = fs.existsSync(targetReleaseDir);
 
         if (shouldCompile) {
+            // Base arguments for `cargo check` and `cross build`
+
+            const buildArgs = [];
+
+            let extraBuildArgs =
+                options.extraBuildArgs || Settings.EXTRA_BUILD_ARGS;
+            let features = options.features || Settings.FEATURES;
+
+            if (extraBuildArgs) {
+                buildArgs.push(...extraBuildArgs);
+            }
+            if (features) {
+                buildArgs.push('--features', features.join(','));
+            }
+
+            // Set process environment (optional)
+            let inputEnv =
+                options.buildEnvironment ||
+                Settings.BUILD_ENVIRONMENT;
+            const buildEnv = inputEnv
+                ? {
+                      ...process.env,
+                      ...inputEnv,
+                  }
+                : undefined;
+
             // Run `cargo check` on an initial time, if needed
             if (Settings.RUN_CARGO_CHECK && !_ranCargoCheck) {
                 _ranCargoCheck = true;
-                checkCode(options, releaseDirExists);
+                checkCode(options, buildArgs, buildEnv);
             }
 
             if (releaseDirExists) {
@@ -124,12 +178,33 @@ export function build(options: BuildOptions): void {
                 '--release',
                 '--target',
                 options.target,
+                ...buildArgs,
                 ...extra_args!,
             ];
 
+            // Pass compile-time environment variables into `cross build`.
+            // See <https://github.com/cross-rs/cross#passing-environment-variables-into-the-build-environment>.
+            let createdCrossTomlFile: boolean | undefined = undefined;
+            if (inputEnv) {
+                // Create and use a temporary `Cross.toml`, if needed
+                let filePath = pathToCrossToml(options.entry);
+                if (!fs.existsSync(filePath)) {
+                    createdCrossTomlFile = true;
+                    const fileContents = `[build.env]\npassthrough = ${JSON.stringify(
+                        Object.keys(inputEnv)
+                    )}`;
+                    fs.writeFileSync(filePath, fileContents);
+                }
+            }
+
             const cross = spawnSync('cross', args, {
                 cwd: options.entry,
+                env: buildEnv,
             });
+
+            if (createdCrossTomlFile) {
+                deleteFile(pathToCrossToml(options.entry));
+            }
 
             if (cross.error) {
                 throw cross.error;
@@ -159,8 +234,16 @@ export function build(options: BuildOptions): void {
  */
 export function checkCode(
     options: BuildOptions,
-    releaseDirExists: boolean
+    buildArgs: string[],
+    buildEnv: NodeJS.ProcessEnv | undefined
 ) {
+    let targetReleaseDir = path.join(
+        options.entry,
+        'target',
+        'release'
+    );
+    const releaseDirExists = fs.existsSync(targetReleaseDir);
+
     if (!releaseDirExists) {
         // The `release` directory doesn't exist for the specified
         // target. This is most likely an initial run, so `cargo` will
@@ -178,14 +261,14 @@ export function checkCode(
     const args: string[] = [
         'check',
         '--release',
-        '--target',
-        options.target,
+        ...buildArgs,
         '--color',
         'always',
     ];
 
     const check = spawnSync('cargo', args, {
         cwd: options.entry,
+        env: buildEnv,
     });
 
     if (check.error) {
@@ -203,4 +286,8 @@ export function checkCode(
     }
 
     logTime(start, `✅  Run \`cargo check\``);
+}
+
+function pathToCrossToml(entry: string): string {
+    return path.join(entry, 'Cross.toml');
 }

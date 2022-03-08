@@ -68,6 +68,20 @@ async fn main() -> Result<(), Error> {
 pub(crate) async fn my_handler(event: Request, ctx: Context) -> Response {
     info!("Request: {:?}", event);
 
+    // optional feature flags as defined in `Cargo.toml`. this is enabled
+    // in the CDK code in the `lib/` folder.
+
+    #[cfg(feature = "my-first-feature")]
+    info!("Congrats! The 1st feature (my-first-feature) is enabled.");
+
+    #[cfg(feature = "my-second-feature")]
+    info!("Congrats! The 2nd feature (my-second-feature) is enabled.");
+
+    // retrieve an environment variable set at build (compile) time.
+    let build_env_var = env!("MY_BUILD_ENV_VAR");
+    debug!("Resolved compile-time value of `MY_BUILD_ENV_VAR`: {}", build_env_var);
+
+    // retrieve an environment variable set in the lambda.
     let bucket_name = var("BUCKET_NAME")
         .expect("A BUCKET_NAME must be set in this app's Lambda environment variables.");
 

@@ -1,6 +1,7 @@
 // This example requires the following input to succeed:
 // { "command": "do something" }
 mod models;
+mod utils;
 
 use models::*;
 use shared::*;
@@ -27,6 +28,10 @@ async fn main() -> Result<(), Error> {
 
 pub(crate) async fn my_handler(event: Request, ctx: Context) -> Response {
     info!("Request: {:?}", event);
+
+    // optional feature flags as defined in `Cargo.toml`. this is enabled
+    // in the CDK code in the `lib/` folder.
+    utils::log_enabled_features();
 
     let bucket_name = var("BUCKET_NAME")
         .expect("A BUCKET_NAME must be set in this app's Lambda environment variables.");

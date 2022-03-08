@@ -2,20 +2,33 @@ import { Stack, StackProps } from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
-import { RustFunction, Settings } from 'rust.aws-cdk-lambda';
+// import { RustFunction, Settings } from 'rust.aws-cdk-lambda';
 // uncomment for local testing
-// import { RustFunction, Settings } from '../../../lib';
+import { RustFunction, Settings } from '../../../lib';
 
 export class RustWorkspacesStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
         // Set the base Cargo workspace directory
-        Settings.workspace_dir = 'my_lambdas';
+        Settings.WORKSPACE_DIR = 'my_lambdas';
+
+        // Enable optional features and env variables at build (compile) time.
+        Settings.FEATURES = [
+            'my-dev-feature',
+            // uncomment to see how the lambda output changes!
+            // 'my-prod-feature',
+        ];
+        Settings.BUILD_ENVIRONMENT = {
+            LEARN_RUST_URL: 'https://doc.rust-lang.org',
+        };
 
         // Uncomment if you want to build (e.g. cross-compile) each target, or
         // workspace member, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
+
+        // Uncomment to cross-compile Rust code to a different Lambda architecture.
+        // Settings.TARGET = 'aarch64-unknown-linux-gnu';
 
         const bucket = new s3.Bucket(this, 'RustWorkspacesBucket', {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,

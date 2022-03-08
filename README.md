@@ -46,10 +46,10 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ cargo install cross
     ```
 
-3. Install the **x86_64-unknown-linux-musl** toolchain with Rustup by running:
+3. Install the **x86_64-unknown-linux-gnu** toolchain with Rustup by running:
 
     ```shell
-    $ rustup target add x86_64-unknown-linux-musl
+    $ rustup target add x86_64-unknown-linux-gnu
     ```
 
 Finally, ensure you have [Docker] installed and running, as it will be used by `cross` to compile Rust code for deployment.
@@ -108,7 +108,7 @@ When bundling the code, the `RustFunction` runs the following steps in order:
 -   First it runs `cargo check` to confirm that the Rust code can compile.
     Note that this is an optional step, and [can be disabled](#settings) as mentioned below.
 
--   Next it calls `cross build`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **x86_64-unknown-linux-musl** target, as mentioned above.
+-   Next it calls `cross build`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **x86_64-unknown-linux-gnu** target, as mentioned above.
 
 -   Finally, it copies the release app binary from the `target/` folder to a file named `bootstrap`, which the Lambda custom runtime environment looks for. It adds this new file under the _build directory_, which defaults to a `.build/` folder under the directory where `cdk` was invoked.
 
@@ -202,19 +202,74 @@ You can find a more complete project structure in the [rust-workspaces/] CDK sam
 [workspaces]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
 [rust-workspaces/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-workspaces
 
+## Conditional Compilation
+
+A common use case is building Rust code with enabled [features], and compile-
+time environment variables that can be used with the [`env!`] macro.
+
+For example, we might want to run different logic in our code for _development_ and _production_ environments, or call a different API endpoint depending on which environment we are deploying code to.
+
+For a sample CDK app that demonstrate such usage, check out the [rust-bins/] example.
+
+### Enabling Features
+
+You can achieve conditional compilation by [introducing features](https://stackoverflow.com/a/27634313/10237506) which can later be enabled in Rust code.
+
+In the `Cargo.toml`, create a new `features` section:
+
+```toml
+[features]
+my-feature = [] # feature has no explicit dependencies
+```
+
+In your code, add the line `#[cfg(feature="my-feature")]` before a function declaration, or before a statement to execute.
+
+In your CDK code in the `lib/` folder, add the following line:
+
+```ts
+// Enable features at compile or build time.
+Settings.FEATURES = ['my-feature'];
+```
+
+### Build Environment Variables
+
+You can also introduce environment variables which are resolved at build or compile time. These values can be used in code via the [`env!`] macro in Rust.
+
+In your code, add a call to the `env!()` macro:
+
+```rust
+// Retrieve an environment variable set at build (compile) time.
+let build_value = env!("MY_BUILD_VAR");
+```
+
+In your CDK code in the `lib/` folder, add the following line:
+
+```ts
+// Enable environment variables at compile or build time.
+Settings.BUILD_ENVIRONMENT = {
+    MY_BUILD_VAR: 'Hello World! Testing 123.',
+};
+```
+
+[features]: https://doc.rust-lang.org/cargo/reference/features.html
+[`env!`]: https://doc.rust-lang.org/std/macro.env.html
+
 ## Rust Function Properties
 
 Below lists some commonly used properties you can pass in to the `RustFunction` construct.
 
-| Name           | Description                                                                                                                                                                                                                                                                                                                                                                                     |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `target`       | Build target to cross-compile to. Defaults to the target for Linux MUSL, `x86_64-unknown-linux-musl`.                                                                                                                                                                                                                                                                                           |
-| `directory`    | Entry point where the project's main `Cargo.toml` is located. By default, the construct will use directory where `cdk` was invoked as the directory where Cargo files are located.                                                                                                                                                                                                              |
-| `buildDir`     | Default Build directory, which defaults to a `.build` folder under the project's root directory.                                                                                                                                                                                                                                                                                                |
-| `bin`          | Executable name to pass to `--bin`                                                                                                                                                                                                                                                                                                                                                              |
-| `package`      | Workspace package name to pass to `--package`                                                                                                                                                                                                                                                                                                                                                   |
-| `setupLogging` | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function.<br><br>The format defaults to `warn,module_name=debug`, which means that the default log level is `warn`, and the executable or library's log level is `debug`. |
-|                |
+| Name               | Description                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `target`           | Build target to cross-compile to. Defaults to the target for the **x86_64** architecture, `x86_64-unknown-linux-gnu`.                                                                                                                                                                                                                                                                           |
+| `directory`        | Entry point where the project's main `Cargo.toml` is located. By default, the construct will use directory where `cdk` was invoked as the directory where Cargo files are located.                                                                                                                                                                                                              |
+| `buildDir`         | Default Build directory, which defaults to a `.build` folder under the project's root directory.                                                                                                                                                                                                                                                                                                |
+| `bin`              | Executable name to pass to `--bin`                                                                                                                                                                                                                                                                                                                                                              |
+| `package`          | Workspace package name to pass to `--package`                                                                                                                                                                                                                                                                                                                                                   |
+| `setupLogging`     | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function.<br><br>The format defaults to `warn,module_name=debug`, which means that the default log level is `warn`, and the executable or library's log level is `debug`. |
+|                    |
+| `features`         | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                                                                                                                                                                     |
+| `buildEnvironment` | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cross build`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                                                                                                                                                                        |
+| `extraBuildArgs`   | Additional arguments that are passed in at build time to both `cargo check` and `cross build`. For example, [`--all-features`].                                                                                                                                                                                                                                                                 |
 
 ## Settings
 
@@ -232,4 +287,7 @@ Below are some useful _global_ defaults which can be set for all Rust Lambda Fun
 | `RUN_CARGO_CHECK`    | Whether to run `cargo check` to validate Rust code before building it with `cross`. Defaults to _true_.                                                                                                                                     |
 | `DEFAULT_LOG_LEVEL`  | Log Level for non-module libraries. Note that this value is only used when `RustFunctionProps.setupLogging` is enabled. Defaults to `warn`.                                                                                                 |
 | `MODULE_LOG_LEVEL`   | Log Level for a module (i.e. the executable). Note that this value is only used when `RustFunctionProps.setupLogging` is enabled. Defaults to `debug`.                                                                                      |
-| `workspace_dir`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
+| `WORKSPACE_DIR`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
+| `FEATURES`           | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                 |
+| `BUILD_ENVIRONMENT`  | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cross build`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                    |
+| `EXTRA_BUILD_ARGS`   | Additional arguments that are passed in at build time to both `cargo check` and `cross build`. For example, [`--all-features`].                                                                                                             |

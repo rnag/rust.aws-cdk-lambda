@@ -1,13 +1,17 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import * as crypto from 'crypto';
-import * as fs from 'fs';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
-import * as toml from 'toml';
 import { Settings } from '.';
 import { BaseBuildProps, build } from './build';
-import { logTime } from './utils';
+import { LAMBDA_TARGETS } from './settings';
+import {
+    createDirectory,
+    getPackageName,
+    lambdaArchitecture,
+    logTime,
+} from './utils';
 
 /**
  * Properties for a RustFunction
@@ -46,18 +50,6 @@ export interface RustFunctionProps
 }
 
 /**
- * Base layout of a `Cargo.toml` file in a Rust project
- *
- * Note: This is only used when `RustFunctionProps.bin` is not defined
- * from above.
- */
-export interface CargoTomlProps {
-    readonly package: {
-        name: string;
-    };
-}
-
-/**
  * A Rust Lambda function built using cross
  */
 export class RustFunction extends lambda.Function {
@@ -68,7 +60,9 @@ export class RustFunction extends lambda.Function {
     ) {
         const entry = props.directory || Settings.ENTRY;
         const handler = 'does.not.matter';
-        const target = props.target || Settings.TARGET;
+        const target =
+            <LAMBDA_TARGETS>props.target || Settings.TARGET;
+        const arch = props.architecture || lambdaArchitecture(target);
         const buildDir = props.buildDir || Settings.BUILD_DIR;
 
         let executable: string;
@@ -97,9 +91,9 @@ export class RustFunction extends lambda.Function {
 
         // Build with `cross`
         build({
+            ...props,
             entry,
             bin: binName,
-            package: props.package,
             target: target,
             outDir: handlerDir,
         });
@@ -121,33 +115,10 @@ export class RustFunction extends lambda.Function {
         super(scope, id, {
             ...props,
             runtime: Settings.RUNTIME,
+            architecture: arch,
             code: lambda.Code.fromAsset(handlerDir),
             handler: handler,
             environment: lambdaEnv,
         });
-    }
-}
-
-function createDirectory(dir: string) {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-}
-
-function getPackageName(entry: string) {
-    const tomlFilePath = path.join(entry, 'Cargo.toml');
-    // console.trace(`Parsing TOML file at ${tomlFilePath}`);
-
-    try {
-        const contents = fs.readFileSync(tomlFilePath, 'utf8');
-        let data: CargoTomlProps = toml.parse(contents);
-        return data.package.name;
-    } catch (err) {
-        throw new Error(
-            `Unable to parse package name from \`${tomlFilePath}\`\n` +
-                `  ${err}\n` +
-                `  Resolution: Pass the executable as the \`bin\` parameter, ` +
-                `or as \`package\` for a workspace.`
-        );
     }
 }

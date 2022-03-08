@@ -20,3 +20,12 @@ aws-config = "0.6.0"
 # We are using the Amazon Simple Storage Service (Amazon S3) crate in this example,
 # but you can use any SDK crate in your Lambda code.
 aws-sdk-s3 = "0.6.0"
+
+[features]
+
+# We could choose to enable any project dependencies marked as `optional = true`
+# here, but in this case it simply serves as a config flag that we use in code.
+#
+# See https://stackoverflow.com/a/27634313/10237506 for more info.
+my-dev-feature = []
+my-prod-feature = []

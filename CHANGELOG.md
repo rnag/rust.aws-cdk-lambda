@@ -11,6 +11,33 @@ Possible header types:
 
 ## [Unreleased]
 
+## v0.4.0 (2022-03-08)
+
+### Features
+
+-   Rename `Settings` parameter `workspace_dir` -> `WORKSPACE_DIR`.
+-   Add support for Rust [features] and compile-time [environment variables].
+-   Add parameters to `Settings`:
+    -   `FEATURES`
+    -   `BUILD_ENVIRONMENT`
+    -   `EXTRA_BUILD_ARGS`
+-   Add parameters to `RustFunctionProps`:
+    -   `features`
+    -   `buildEnvironment`
+    -   `extraBuildArgs`
+
+[features]: https://doc.rust-lang.org/cargo/reference/features.html
+[environment variables]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
+
+### Breaking Changes
+
+-   Updated default target from `x86_64-unknown-linux-musl` -> `x86_64-unknown-linux-gnu`; technically this is not a _breaking_ change, but it will require the target to be added via `rustup`.
+
+### Bug Fixes
+
+-   Ensure that the Lambda architecture is correctly set based on the `target` to cross-compile to.
+-   Do not pass `--target` when running `cargo check`, as this can result in errors in some cases.
+
 ## v0.3.0 (2022-02-23)
 
 ### Features
