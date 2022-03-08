@@ -1,5 +1,4 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import * as crypto from 'crypto';
 import * as path from 'path';
