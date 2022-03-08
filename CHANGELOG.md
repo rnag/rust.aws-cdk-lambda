@@ -29,9 +29,14 @@ Possible header types:
 [features]: https://doc.rust-lang.org/cargo/reference/features.html
 [environment variables]: https://doc.rust-lang.org/cargo/reference/environment-variables.html#environment-variables-cargo-sets-for-crates
 
+### Breaking Changes
+
+-   Updated default target from `x86_64-unknown-linux-musl` -> `x86_64-unknown-linux-gnu`; technically this is not a _breaking_ change, but it will require the target to be added via `rustup`.
+
 ### Bug Fixes
 
 -   Ensure that the Lambda architecture is correctly set based on the `target` to cross-compile to.
+-   Do not pass `--target` when running `cargo check`, as this can result in errors in some cases.
 
 ## v0.3.0 (2022-02-23)
 

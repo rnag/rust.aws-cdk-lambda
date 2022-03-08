@@ -27,6 +27,9 @@ export class RustWorkspacesStack extends Stack {
         // workspace member, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
 
+        // Uncomment to cross-compile Rust code to a different Lambda architecture.
+        // Settings.TARGET = 'aarch64-unknown-linux-gnu';
+
         const bucket = new s3.Bucket(this, 'RustWorkspacesBucket', {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             publicReadAccess: false,

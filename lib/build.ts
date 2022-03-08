@@ -26,7 +26,7 @@ export interface BaseBuildProps {
      * Normally you'll need to first add the target to your toolchain:
      *    $ rustup target add <target>
      *
-     * The target defaults to `x86_64-unknown-linux-musl` if not passed.
+     * The target defaults to `x86_64-unknown-linux-gnu` if not passed.
      */
     readonly target?: string;
 
@@ -129,11 +129,7 @@ export function build(options: BuildOptions): void {
         if (shouldCompile) {
             // Base arguments for `cargo check` and `cross build`
 
-            const buildArgs = [
-                '--release',
-                '--target',
-                options.target,
-            ];
+            const buildArgs = [];
 
             let extraBuildArgs =
                 options.extraBuildArgs || Settings.EXTRA_BUILD_ARGS;
@@ -160,12 +156,7 @@ export function build(options: BuildOptions): void {
             // Run `cargo check` on an initial time, if needed
             if (Settings.RUN_CARGO_CHECK && !_ranCargoCheck) {
                 _ranCargoCheck = true;
-                checkCode(
-                    options,
-                    buildArgs,
-                    buildEnv,
-                    releaseDirExists
-                );
+                checkCode(options, buildArgs, buildEnv);
             }
 
             if (releaseDirExists) {
@@ -184,6 +175,9 @@ export function build(options: BuildOptions): void {
 
             const args: string[] = [
                 'build',
+                '--release',
+                '--target',
+                options.target,
                 ...buildArgs,
                 ...extra_args!,
             ];
@@ -241,9 +235,15 @@ export function build(options: BuildOptions): void {
 export function checkCode(
     options: BuildOptions,
     buildArgs: string[],
-    buildEnv: NodeJS.ProcessEnv | undefined,
-    releaseDirExists: boolean
+    buildEnv: NodeJS.ProcessEnv | undefined
 ) {
+    let targetReleaseDir = path.join(
+        options.entry,
+        'target',
+        'release'
+    );
+    const releaseDirExists = fs.existsSync(targetReleaseDir);
+
     if (!releaseDirExists) {
         // The `release` directory doesn't exist for the specified
         // target. This is most likely an initial run, so `cargo` will
@@ -260,6 +260,7 @@ export function checkCode(
 
     const args: string[] = [
         'check',
+        '--release',
         ...buildArgs,
         '--color',
         'always',

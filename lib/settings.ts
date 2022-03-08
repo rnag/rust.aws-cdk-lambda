@@ -34,7 +34,7 @@ export const Settings = {
      *
      * [official AWS documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
      */
-    TARGET: 'x86_64-unknown-linux-musl' as LAMBDA_TARGETS,
+    TARGET: 'x86_64-unknown-linux-gnu' as LAMBDA_TARGETS,
 
     /**
      * Custom Lambda Runtime, running on `Amazon Linux 2`
