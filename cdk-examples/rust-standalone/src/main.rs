@@ -72,14 +72,14 @@ pub(crate) async fn my_handler(event: Request, ctx: Context) -> Response {
     // in the CDK code in the `lib/` folder.
 
     #[cfg(feature = "my-first-feature")]
-    println!("Congrats! The 1st feature (my-first-feature) is enabled.");
+    info!("Congrats! The 1st feature (my-first-feature) is enabled.");
 
     #[cfg(feature = "my-second-feature")]
-    println!("Congrats! The 2nd feature (my-second-feature) is enabled.");
+    info!("Congrats! The 2nd feature (my-second-feature) is enabled.");
 
     // retrieve an environment variable set at build (compile) time.
     let build_env_var = env!("MY_BUILD_ENV_VAR");
-    println!("Resolved compile-time value of `MY_BUILD_ENV_VAR`: {}", build_env_var);
+    debug!("Resolved compile-time value of `MY_BUILD_ENV_VAR`: {}", build_env_var);
 
     // retrieve an environment variable set in the lambda.
     let bucket_name = var("BUCKET_NAME")
