@@ -209,6 +209,8 @@ time environment variables that can be used with the [`env!`] macro.
 
 For example, we might want to run different logic in our code for _development_ and _production_ environments, or call a different API endpoint depending on which environment we are deploying code to.
 
+For a sample CDK app that demonstrate such usage, check out the [rust-bins/] example.
+
 ### Enabling Features
 
 You can achieve conditional compilation by [introducing features](https://stackoverflow.com/a/27634313/10237506) which can later be enabled in Rust code.
@@ -222,7 +224,7 @@ my-feature = [] # feature has no explicit dependencies
 
 In your code, add the line `#[cfg(feature="my-feature")]` before a function declaration, or before a statement to execute.
 
-In your CDK code in the `lib/` folder, add the following line:
+In your CDK code in _Typescript_ or _Node.js_, add the following line:
 
 ```ts
 // Enable features at compile or build time.
@@ -240,7 +242,7 @@ In your code, add a call to the `env!()` macro:
 let build_value = env!("MY_BUILD_VAR");
 ```
 
-In your CDK code in the `lib/` folder, add the following line:
+In your CDK code in _Typescript_ or _Node.js_, add the following line:
 
 ```ts
 // Enable environment variables at compile or build time.
