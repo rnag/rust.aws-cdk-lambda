@@ -31,6 +31,11 @@ export interface BaseBuildProps {
     readonly target?: string;
 
     /**
+     * A list of features to activate when compiling Rust code.
+     */
+    readonly features?: string[];
+
+    /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
      * build` or `cross build`.
      *
@@ -41,11 +46,6 @@ export interface BaseBuildProps {
      * @default - No environment variables.
      */
     readonly buildEnvironment?: NodeJS.ProcessEnv;
-
-    /**
-     * A list of features to activate when compiling Rust code.
-     */
-    readonly features?: string[];
 
     /**
      * Additional arguments that are passed in at build time to both

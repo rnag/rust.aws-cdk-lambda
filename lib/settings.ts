@@ -133,7 +133,7 @@ export const Settings = {
      *   members = ["lambda1", "lambda2"]
      *
      * @deprecated Use `WORKSPACE_DIR()` instead. This will be removed
-     * in v0.5.0.
+     * in v1.0.
      */
     set workspace_dir(folder: string) {
         this.WORKSPACE_DIR = folder;
