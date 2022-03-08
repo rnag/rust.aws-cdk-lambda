@@ -250,7 +250,7 @@ Settings.BUILD_ENVIRONMENT = {
 ```
 
 [features]: https://doc.rust-lang.org/cargo/reference/features.html
-[`env!]: https://doc.rust-lang.org/std/macro.env.html
+[`env!`]: https://doc.rust-lang.org/std/macro.env.html
 
 ## Rust Function Properties
 
