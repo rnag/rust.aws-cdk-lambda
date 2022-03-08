@@ -202,6 +202,56 @@ You can find a more complete project structure in the [rust-workspaces/] CDK sam
 [workspaces]: https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html
 [rust-workspaces/]: https://github.com/rnag/rust.aws-cdk-lambda/tree/main/cdk-examples/rust-workspaces
 
+## Conditional Compilation
+
+A common use case is building Rust code with enabled [features], and compile-
+time environment variables that can be used with the [`env!`] macro.
+
+For example, we might want to run different logic in our code for _development_ and _production_ environments, or call a different API endpoint depending on which environment we are deploying code to.
+
+### Enabling Features
+
+You can conditionally compile code by [introducing features](https://stackoverflow.com/a/27634313/10237506) to enable.
+
+In the `Cargo.toml`, create a new `features` section as below:
+
+```toml
+[features]
+my-feature = [] # feature has no explicit dependencies
+```
+
+In your code, add the line `#[cfg(feature="my-feature")]` before a function declaration, or before a statement to execute.
+
+In your CDK code in the `lib/` folder, add the following line:
+
+```ts
+// Enable features at compile or build time.
+Settings.FEATURES = ['my-feature'];
+```
+
+### Build Environment Variables
+
+You can also introduce environment variables which are resolved at build or compile time. These values can be used in code via the [`env!`] macro in Rust.
+
+In your code, add a call to the `env!()` macro:
+
+```rust
+// Retrieve an environment variable set at build (compile) time.
+let build_value = env!("MY_BUILD_VAR");
+```
+
+In your CDK code in the `lib/` folder, add the following line:
+
+```ts
+// Enable environment variables at compile or build time.
+Settings.BUILD_ENVIRONMENT = {
+    MY_BUILD_VAR: 'Hello World! Testing 123.',
+};
+```
+
+[features]: https://doc.rust-lang.org/cargo/reference/features.html
+[`env!]: https://doc.rust-lang.org/std/macro.env.html
+
 ## Rust Function Properties
 
 Below lists some commonly used properties you can pass in to the `RustFunction` construct.
