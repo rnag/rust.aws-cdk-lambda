@@ -211,7 +211,7 @@ For example, we might want to run different logic in our code for _development_ 
 
 ### Enabling Features
 
-You can conditionally compile code by [introducing features](https://stackoverflow.com/a/27634313/10237506) to enable.
+You can achieve conditional compilation by [introducing features](https://stackoverflow.com/a/27634313/10237506) which can later be enabled in Rust code.
 
 In the `Cargo.toml`, create a new `features` section as below:
 
