@@ -22,3 +22,12 @@ aws-sdk-s3 = "0.6.0"
 # Dependencies for `my_lambda2`
 anyhow = "1.0.53"
 reqwest = { version = "0.11.9", default-features=false, features = ["rustls-tls", "json", "blocking", "stream", "multipart"] }
+
+[features]
+
+# We could choose to enable any project dependencies marked as `optional = true`
+# here, but in this case it simply serves as a config flag that we use in code.
+#
+# See https://stackoverflow.com/a/27634313/10237506 for more info.
+my-dev-feature = []
+my-prod-feature = []
