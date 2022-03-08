@@ -17,7 +17,7 @@ Possible header types:
 
 -   Rename `Settings` parameter `workspace_dir` -> `WORKSPACE_DIR`.
 -   Add support for Rust [features] and compile-time [environment variables].
--   Add parameters to `Settings:
+-   Add parameters to `Settings`:
     -   `FEATURES`
     -   `BUILD_ENVIRONMENT`
     -   `EXTRA_BUILD_ARGS`
