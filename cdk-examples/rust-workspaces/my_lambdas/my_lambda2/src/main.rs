@@ -32,6 +32,9 @@ async fn main() -> Result<(), Error> {
 pub(crate) async fn my_handler(event: Request, ctx: LambdaContext) -> Response {
     info!("Request: {:?}", event);
 
+    // retrieve an environment variable set at build (compile) time.
+    let rust_lang_url = env!("LEARN_RUST_URL");
+
     // extract some useful info from the request
     let command = event.command;
 
@@ -59,17 +62,15 @@ pub(crate) async fn my_handler(event: Request, ctx: LambdaContext) -> Response {
 
     let start = Instant::now();
 
-    let url = "https://doc.rust-lang.org";
-
-    debug!("Fetching {:?}...", url);
+    debug!("Fetching {:?}...", rust_lang_url);
 
     // reqwest::get() is a convenience function.
     //
     // In most cases, you should create/build a reqwest::Client and reuse
     // it for all requests.
-    let res = reqwest::get(url)
+    let res = reqwest::get(rust_lang_url)
         .await
-        .context(format!("Failed to GET {}", url))?;
+        .context(format!("Failed to GET {}", rust_lang_url))?;
 
     debug!("Made GET request in {:.2?}", start.elapsed());
 
