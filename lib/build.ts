@@ -39,11 +39,8 @@ export interface BaseBuildProps {
      * Lambda function source code.
      *
      * @default - No environment variables.
-     * @stability stable
      */
-    readonly buildEnvironment?: {
-        [key: string]: string;
-    };
+    readonly buildEnvironment?: NodeJS.ProcessEnv;
 
     /**
      * A list of features to activate when compiling Rust code.
@@ -131,26 +128,32 @@ export function build(options: BuildOptions): void {
 
         if (shouldCompile) {
             // Base arguments for `cargo check` and `cross build`
+
             const buildArgs = [
                 '--release',
                 '--target',
                 options.target,
             ];
-            if (options.extraBuildArgs) {
-                buildArgs.push(...options.extraBuildArgs);
+
+            let extraBuildArgs =
+                options.extraBuildArgs || Settings.EXTRA_BUILD_ARGS;
+            let features = options.features || Settings.FEATURES;
+
+            if (extraBuildArgs) {
+                buildArgs.push(...extraBuildArgs);
             }
-            if (options.features) {
-                buildArgs.push(
-                    '--features',
-                    options.features.join(',')
-                );
+            if (features) {
+                buildArgs.push('--features', features.join(','));
             }
 
             // Set process environment (optional)
-            let buildEnv = options.buildEnvironment
+            let inputEnv =
+                options.buildEnvironment ||
+                Settings.BUILD_ENVIRONMENT;
+            const buildEnv = inputEnv
                 ? {
                       ...process.env,
-                      ...options.buildEnvironment,
+                      ...inputEnv,
                   }
                 : undefined;
 
@@ -188,13 +191,13 @@ export function build(options: BuildOptions): void {
             // Pass compile-time environment variables into `cross build`.
             // See <https://github.com/cross-rs/cross#passing-environment-variables-into-the-build-environment>.
             let createdCrossTomlFile: boolean | undefined = undefined;
-            if (options.buildEnvironment) {
+            if (inputEnv) {
                 // Create and use a temporary `Cross.toml`, if needed
                 let filePath = pathToCrossToml(options.entry);
                 if (!fs.existsSync(filePath)) {
                     createdCrossTomlFile = true;
                     const fileContents = `[build.env]\npassthrough = ${JSON.stringify(
-                        Object.keys(options.buildEnvironment)
+                        Object.keys(inputEnv)
                     )}`;
                     fs.writeFileSync(filePath, fileContents);
                 }

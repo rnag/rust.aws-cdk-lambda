@@ -1,6 +1,16 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 
+// These are the valid cross-compile targets for AWS Lambda.
+//
+// See also: <https://github.com/awslabs/aws-lambda-rust-runtime/discussions/306#discussioncomment-485478>.
+export type LAMBDA_TARGETS =
+    // For Arm64 Lambda functions
+    | 'aarch64-unknown-linux-gnu'
+    // For x86_64 Lambda functions
+    | 'x86_64-unknown-linux-gnu'
+    | 'x86_64-unknown-linux-musl';
+
 /**
  * Contains common settings and default values.
  */
@@ -24,7 +34,7 @@ export const Settings = {
      *
      * [official AWS documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
      */
-    TARGET: 'x86_64-unknown-linux-musl',
+    TARGET: 'x86_64-unknown-linux-musl' as LAMBDA_TARGETS,
 
     /**
      * Custom Lambda Runtime, running on `Amazon Linux 2`
@@ -63,6 +73,36 @@ export const Settings = {
      * is enabled.
      */
     MODULE_LOG_LEVEL: 'debug',
+
+    /**
+     * A list of features to activate when compiling Rust code.
+     *
+     * @default - No enabled features.
+     */
+    FEATURES: undefined as string[] | undefined,
+
+    /**
+     * Key-value pairs that are passed in at compile time, i.e. to `cargo
+     * build` or `cross build`.
+     *
+     * Use environment variables to apply configuration changes, such
+     * as test and production environment configurations, without changing your
+     * Lambda function source code.
+     *
+     * @default - No environment variables.
+     */
+    BUILD_ENVIRONMENT: undefined as NodeJS.ProcessEnv | undefined,
+
+    /**
+     * Additional arguments that are passed in at build time to both
+     * `cargo check` and `cross build`.
+     *
+     * ## Examples
+     *
+     * - `--all-features`
+     * - `--no-default-features`
+     */
+    EXTRA_BUILD_ARGS: undefined as string[] | undefined,
 
     /**
      * Sets the root workspace directory. By default, the workspace directory

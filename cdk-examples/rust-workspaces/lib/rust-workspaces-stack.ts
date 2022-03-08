@@ -13,6 +13,16 @@ export class RustWorkspacesStack extends Stack {
         // Set the base Cargo workspace directory
         Settings.WORKSPACE_DIR = 'my_lambdas';
 
+        // Enable optional features and env variables at build (compile) time.
+        Settings.FEATURES = [
+            'my-dev-feature',
+            // uncomment to see how the lambda output changes!
+            // 'my-prod-feature',
+        ];
+        Settings.BUILD_ENVIRONMENT = {
+            LEARN_RUST_URL: 'https://doc.rust-lang.org',
+        };
+
         // Uncomment if you want to build (e.g. cross-compile) each target, or
         // workspace member, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
@@ -28,15 +38,6 @@ export class RustWorkspacesStack extends Stack {
             setupLogging: true,
             environment: {
                 BUCKET_NAME: bucket.bucketName,
-            },
-            // Enable optional features and env variables at build (compile) time.
-            features: [
-                'my-dev-feature',
-                // uncomment to see how the lambda output changes!
-                // 'my-prod-feature'
-            ],
-            buildEnvironment: {
-                LEARN_RUST_URL: 'https://doc.rust-lang.org',
             },
         });
 

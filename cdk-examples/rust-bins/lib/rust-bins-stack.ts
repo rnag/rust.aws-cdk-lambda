@@ -10,6 +10,16 @@ export class RustBinsStack extends Stack {
     constructor(scope: Construct, id: string, props?: StackProps) {
         super(scope, id, props);
 
+        // Enable optional features and env variables at build (compile) time.
+        Settings.FEATURES = [
+            'my-dev-feature',
+            // uncomment to see how the lambda output changes!
+            // 'my-prod-feature'
+        ];
+        Settings.BUILD_ENVIRONMENT = {
+            LEARN_RUST_URL: 'https://doc.rust-lang.org',
+        };
+
         // Uncomment if you want to build (e.g. cross-compile) each target, or
         // binary, individually.
         // Settings.BUILD_INDIVIDUALLY = true;
@@ -25,15 +35,6 @@ export class RustBinsStack extends Stack {
             setupLogging: true,
             environment: {
                 BUCKET_NAME: bucket.bucketName,
-            },
-            // Enable optional features and env variables at build (compile) time.
-            features: [
-                'my-dev-feature',
-                // uncomment to see how the lambda output changes!
-                // 'my-prod-feature'
-            ],
-            buildEnvironment: {
-                LEARN_RUST_URL: 'https://doc.rust-lang.org',
             },
         });
 

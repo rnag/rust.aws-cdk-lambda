@@ -1,11 +1,18 @@
 import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import { Construct } from 'constructs';
 import * as crypto from 'crypto';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
 import { Settings } from '.';
 import { BaseBuildProps, build } from './build';
-import { createDirectory, getPackageName, logTime } from './utils';
+import { LAMBDA_TARGETS } from './settings';
+import {
+    createDirectory,
+    getPackageName,
+    lambdaArchitecture,
+    logTime,
+} from './utils';
 
 /**
  * Properties for a RustFunction
@@ -54,7 +61,9 @@ export class RustFunction extends lambda.Function {
     ) {
         const entry = props.directory || Settings.ENTRY;
         const handler = 'does.not.matter';
-        const target = props.target || Settings.TARGET;
+        const target =
+            <LAMBDA_TARGETS>props.target || Settings.TARGET;
+        const arch = props.architecture || lambdaArchitecture(target);
         const buildDir = props.buildDir || Settings.BUILD_DIR;
 
         let executable: string;
@@ -107,6 +116,7 @@ export class RustFunction extends lambda.Function {
         super(scope, id, {
             ...props,
             runtime: Settings.RUNTIME,
+            architecture: arch,
             code: lambda.Code.fromAsset(handlerDir),
             handler: handler,
             environment: lambdaEnv,

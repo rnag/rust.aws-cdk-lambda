@@ -1,7 +1,9 @@
+import { Architecture } from 'aws-cdk-lib/aws-lambda';
 import * as fs from 'fs';
 import * as path from 'path';
 import { performance } from 'perf_hooks';
 import * as toml from 'toml';
+import { LAMBDA_TARGETS } from './settings';
 
 /**
  * Base layout of a `Cargo.toml` file in a Rust project
@@ -58,4 +60,12 @@ export function getPackageName(entry: string) {
                 `or as \`package\` for a workspace.`
         );
     }
+}
+
+export function lambdaArchitecture(
+    target: LAMBDA_TARGETS
+): Architecture {
+    return target.startsWith('x86_64')
+        ? Architecture.X86_64
+        : Architecture.ARM_64;
 }
