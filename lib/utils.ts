@@ -35,14 +35,14 @@ export function createFile(filePath: string, data: string) {
     }
 }
 
-export function deleteFile(filePath: string, force = true) {
-    if (fs.existsSync(filePath)) {
-        // @ts-ignore: TS2339
-        fs.rmSync(filePath, {
-            force: force,
-        });
-    }
-}
+// export function deleteFile(filePath: string, force = true) {
+//     if (fs.existsSync(filePath)) {
+//         // @ts-ignore: TS2339
+//         fs.rmSync(filePath, {
+//             force: force,
+//         });
+//     }
+// }
 
 export function getPackageName(entry: string) {
     const tomlFilePath = path.join(entry, 'Cargo.toml');

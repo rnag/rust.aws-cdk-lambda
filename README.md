@@ -46,10 +46,10 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ cargo install cross
     ```
 
-3. Install the **x86_64-unknown-linux-gnu** toolchain with Rustup by running:
+3. Install the **aarch64-unknown-linux-gnu** toolchain with Rustup by running:
 
     ```shell
-    $ rustup target add x86_64-unknown-linux-gnu
+    $ rustup target add aarch64-unknown-linux-gnu
     ```
 
 Finally, ensure you have [Docker] installed and running, as it will be used by `cross` to compile Rust code for deployment.
@@ -108,7 +108,7 @@ When bundling the code, the `RustFunction` runs the following steps in order:
 -   First it runs `cargo check` to confirm that the Rust code can compile.
     Note that this is an optional step, and [can be disabled](#settings) as mentioned below.
 
--   Next it calls `cross build`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **x86_64-unknown-linux-gnu** target, as mentioned above.
+-   Next it calls `cross build`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **aarch64-unknown-linux-gnu** target, as mentioned above.
 
 -   Finally, it copies the release app binary from the `target/` folder to a file named `bootstrap`, which the Lambda custom runtime environment looks for. It adds this new file under the _build directory_, which defaults to a `.build/` folder under the directory where `cdk` was invoked.
 
@@ -260,7 +260,7 @@ Below lists some commonly used properties you can pass in to the `RustFunction` 
 
 | Name               | Description                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `target`           | Build target to cross-compile to. Defaults to the target for the **x86_64** architecture, `x86_64-unknown-linux-gnu`.                                                                                                                                                                                                                                                                           |
+| `target`           | Build target to cross-compile to. Defaults to the target for the **arm64** architecture, `aarch64-unknown-linux-gnu`.                                                                                                                                                                                                                                                                           |
 | `directory`        | Entry point where the project's main `Cargo.toml` is located. By default, the construct will use directory where `cdk` was invoked as the directory where Cargo files are located.                                                                                                                                                                                                              |
 | `buildDir`         | Default Build directory, which defaults to a `.build` folder under the project's root directory.                                                                                                                                                                                                                                                                                                |
 | `bin`              | Executable name to pass to `--bin`                                                                                                                                                                                                                                                                                                                                                              |
