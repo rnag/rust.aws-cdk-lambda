@@ -47,7 +47,7 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
 
 3)  Install [Zig] using one of the following options:
 
-    1. Using `pip` (Python 3 required)
+    1. Using [pip] (Python 3 required)
 
         ```shell
         $ pip install ziglang
@@ -68,6 +68,7 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     ```
 
 [npm]: https://nodejs.org/
+[pip]: https://pip.pypa.io/en/stable/
 [`cargo`]: https://www.rust-lang.org/
 [zig]: https://ziglang.org/
 [installation guide]: https://ziglang.org/learn/getting-started/#installing-zig
