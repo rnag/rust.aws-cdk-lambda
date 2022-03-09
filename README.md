@@ -45,7 +45,7 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ rustup target add aarch64-unknown-linux-gnu
     ```
 
-3)  Install [Zig] using one of the following options:
+3)  Install [Zig] using the instructions in their [installation guide]. Alternatively, you can use one of the following options:
 
     1. Using [pip] (Python 3 required):
 
@@ -58,8 +58,6 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
         ```shell
         $ npm install -g @ziglang/cli
         ```
-
-    3. Install [Zig] using the instructions in their [installation guide].
 
 4)  Use [`cargo`] to install _messense/cargo-zigbuild_:
 
