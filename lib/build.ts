@@ -86,6 +86,13 @@ export function build(options: BuildOptions): void {
         let shouldCompile: boolean;
         let extra_args: string[] | undefined;
 
+        let targetReleaseDir = path.join(
+            options.entry,
+            'target',
+            options.target,
+            'release'
+        );
+
         // Build binary
         if (options.bin) {
             outputName = options.bin!;
@@ -118,15 +125,10 @@ export function build(options: BuildOptions): void {
             }
         }
 
-        let targetReleaseDir = path.join(
-            options.entry,
-            'target',
-            options.target,
-            'release'
-        );
-        const releaseDirExists = fs.existsSync(targetReleaseDir);
-
         if (shouldCompile) {
+            // Check if directory `./target/{{target}}/release` exists
+            const releaseDirExists = fs.existsSync(targetReleaseDir);
+
             // Base arguments for `cargo check` and `cross build`
 
             const buildArgs = [];
