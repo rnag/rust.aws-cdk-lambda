@@ -8,7 +8,7 @@ export type LAMBDA_TARGETS =
     // For Arm64 Lambda functions
     | 'aarch64-unknown-linux-gnu'
     // For x86_64 Lambda functions
-    | 'aarch64-unknown-linux-gnu'
+    | 'x86_64-unknown-linux-gnu'
     | 'x86_64-unknown-linux-musl';
 
 /**
@@ -76,7 +76,7 @@ export const Settings = {
 
     /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
-     * build` or `cross build`.
+     * build` or `cargo-zigbuild`.
      *
      * Use environment variables to apply configuration changes, such
      * as test and production environment configurations, without changing your

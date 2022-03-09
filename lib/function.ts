@@ -50,7 +50,7 @@ export interface RustFunctionProps
 }
 
 /**
- * A Rust Lambda function built using cross
+ * A Rust Lambda function built using `cargo-zigbuild`
  */
 export class RustFunction extends lambda.Function {
     constructor(
@@ -89,7 +89,7 @@ export class RustFunction extends lambda.Function {
 
         let start = performance.now();
 
-        // Build with `cross`
+        // Build with `cargo-zigbuild`
         build({
             ...props,
             entry,
