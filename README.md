@@ -47,19 +47,19 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
 
 3)  Install [Zig] using one of the following options:
 
-    i) Using `pip` (Python 3 required)
+    1. Using `pip` (Python 3 required)
 
     ```shell
     $ pip install ziglang
     ```
 
-    ii) Using [npm]:
+    2. Using [npm]:
 
     ```shell
     $ npm install -g @ziglang/cli
     ```
 
-    iii) Install [Zig] using the instructions in their [installation guide].
+    3. Install [Zig] using the instructions in their [installation guide].
 
 4)  Use [`cargo`] to install _messense/cargo-zigbuild_:
 
