@@ -49,15 +49,15 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
 
     i) Using `pip` (Python 3 required)
 
-        ```shell
-        $ pip install ziglang
-        ```
+    ```shell
+    $ pip install ziglang
+    ```
 
     ii) Using [npm]:
 
-        ```shell
-        $ npm install -g @ziglang/cli
-        ```
+    ```shell
+    $ npm install -g @ziglang/cli
+    ```
 
     iii) Install [Zig] using the instructions in their [installation guide].
 
