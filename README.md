@@ -45,7 +45,7 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ rustup target add aarch64-unknown-linux-gnu
     ```
 
-3)  Install [Zig], using either the instructions in their [installation guide] or one of the options below.
+3)  Install [Zig], using the instructions in their [installation guide] or one of the options below.
 
     1. Using [pip] (Python 3 required):
 
