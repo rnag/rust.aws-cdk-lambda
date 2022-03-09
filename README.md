@@ -21,12 +21,11 @@
 
 This library provides a construct for a Rust Lambda function.
 
-It uses [Docker] and [`cross`] under the hood, and follows best practices as outlined
+It uses [`cargo-zigbuild`] under the hood, and follows best practices as outlined
 in the [official AWS documentation].
 
-[docker]: https://www.docker.com/get-started
-[`cross`]: https://github.com/rust-embedded/cross
-[official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
+[`cargo-zigbuild`]: https://github.com/messense/cargo-zigbuild
+[official aws documentation]: https://github.com/awslabs/aws-lambda-rust-runtime#building-and-deploying-your-lambda-functions
 
 ## Rust Function
 
@@ -34,27 +33,44 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
 
 ## Getting Started
 
-1. Install the [npm](https://nodejs.org/) package:
+1. Install the [npm] package:
 
     ```shell
     $ npm i rust.aws-cdk-lambda
     ```
 
-2) Use [`cargo`] to install _rust-embedded/cross_:
-
-    ```shell
-    $ cargo install cross
-    ```
-
-3. Install the **aarch64-unknown-linux-gnu** toolchain with Rustup by running:
+2. Install the **aarch64-unknown-linux-gnu** toolchain with Rustup by running:
 
     ```shell
     $ rustup target add aarch64-unknown-linux-gnu
     ```
 
-Finally, ensure you have [Docker] installed and running, as it will be used by `cross` to compile Rust code for deployment.
+3)  Install [Zig] using one of the following options:
 
+    i) Using `pip` (Python 3 required)
+
+         ```shell
+         $ pip install ziglang
+         ```
+
+    ii) Using [npm]:
+
+         ```shell
+         $ npm install -g @ziglang/cli
+         ```
+
+    iii) Install [Zig] using the instructions in their [installation guide].
+
+4)  Use [`cargo`] to install _messense/cargo-zigbuild_:
+
+    ```shell
+    $ cargo install cargo-zigbuild
+    ```
+
+[npm]: https://nodejs.org/
 [`cargo`]: https://www.rust-lang.org/
+[zig]: https://ziglang.org/
+[installation guide]: https://ziglang.org/learn/getting-started/#installing-zig
 
 ## Examples
 
