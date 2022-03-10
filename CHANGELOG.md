@@ -11,6 +11,10 @@ Possible header types:
 
 ## [Unreleased]
 
+## v1.0.0
+
+-   Do not run `cargo check`, as it appears _cargo-zigbuild_ automatically run this check.
+
 ## v0.4.0 (2022-03-08)
 
 ### Features

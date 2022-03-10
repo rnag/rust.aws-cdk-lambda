@@ -234,7 +234,7 @@ In the `Cargo.toml`, create a new `features` section:
 my-feature = [] # feature has no explicit dependencies
 ```
 
-In your code, add the line `#[cfg(feature="my-feature")]` before a function declaration, or before a statement to execute.
+In your code, add the line `#[cfg(feature = "my-feature")]` before a function declaration, or before a statement to execute.
 
 In your CDK code in the `lib/` folder, add the following line:
 
@@ -251,7 +251,7 @@ In your code, add a call to the `env!()` macro:
 
 ```rust
 // Retrieve an environment variable set at build (compile) time.
-let build_value = env!("MY_BUILD_VAR");
+const BUILD_VALUE: &str = env!("MY_BUILD_VAR");
 ```
 
 In your CDK code in the `lib/` folder, add the following line:
