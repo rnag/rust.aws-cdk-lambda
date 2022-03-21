@@ -126,6 +126,20 @@ When bundling the code, the `RustFunction` runs the following steps in order:
 
 -   The directory path to the executable is then passed in to `lambda.Code.fromAsset`, which creates a _zip file_ from the release binary asset.
 
+## Use `cross` for Deployment
+
+If you instead prefer to use [Docker] and [`cross`] for deployment, as outlined
+in the [official AWS documentation], you can install and use the [latest `v0.x`] release instead:
+
+```shell
+$ npm i rust.aws-cdk-lambda@0.4.0
+```
+
+[docker]: https://www.docker.com/get-started
+[`cross`]: https://github.com/rust-embedded/cross
+[official aws documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
+[latest `v0.x`]: https://github.com/rnag/rust.aws-cdk-lambda/releases/tag/0.4.0
+
 ## Multiple Rust Lambdas
 
 Assuming you have a CDK project with more than one Rust
