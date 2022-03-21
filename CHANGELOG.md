@@ -17,7 +17,8 @@ Possible header types:
 
 -   Switch to use [`cargo-zigbuild`] -- instead of `cross` -- for building Rust code.
 -   Switch the default build architecture from `x86_64` to `arm64`; this package now uses **aarch64-unknown-linux-gnu** as the default build target for AWS Lambda functions, mainly as I've found this architecture to be slightly more performant in general use cases.
--   Do not run `cargo check`, as it appears _cargo-zigbuild_ automatically run this check.
+-   Do not run `cargo check`, as it appears _cargo-zigbuild_ automatically runs this check.
+-   Update `cdk-examples/` with an example of how to conditionally run a code block (more than one statement) when a feature is enabled.
 
 [`cargo-zigbuild`]: https://github.com/messense/cargo-zigbuild
 
