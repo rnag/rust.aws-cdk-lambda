@@ -1,13 +1,10 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
-import { performance } from 'perf_hooks';
 import { Settings } from '.';
-import { deleteFile, logTime } from './utils';
 
 let _builtWorkspaces = false,
-    _builtBinaries = false,
-    _ranCargoCheck = false;
+    _builtBinaries = false;
 
 export interface BaseBuildProps {
     /**
@@ -21,12 +18,12 @@ export interface BaseBuildProps {
     readonly package?: string;
 
     /**
-     * The target to use `cross` to compile to.
+     * The target to use `cargo-zigbuild` to compile to.
      *
      * Normally you'll need to first add the target to your toolchain:
      *    $ rustup target add <target>
      *
-     * The target defaults to `x86_64-unknown-linux-gnu` if not passed.
+     * The target defaults to `aarch64-unknown-linux-gnu` if not passed.
      */
     readonly target?: string;
 
@@ -37,7 +34,7 @@ export interface BaseBuildProps {
 
     /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
-     * build` or `cross build`.
+     * build` or `cargo zig-build`.
      *
      * Use environment variables to apply configuration changes, such
      * as test and production environment configurations, without changing your
@@ -48,8 +45,7 @@ export interface BaseBuildProps {
     readonly buildEnvironment?: NodeJS.ProcessEnv;
 
     /**
-     * Additional arguments that are passed in at build time to both
-     * `cargo check` and `cross build`.
+     * Additional arguments that are passed in at build time to `cargo-zigbuild`.
      *
      * ## Examples
      *
@@ -78,13 +74,20 @@ export interface BuildOptions extends BaseBuildProps {
 }
 
 /**
- * Build with Cross
+ * Build with `cargo-zigbuild zigbuild`
  */
 export function build(options: BuildOptions): void {
     try {
         let outputName: string;
         let shouldCompile: boolean;
         let extra_args: string[] | undefined;
+
+        let targetReleaseDir = path.join(
+            options.entry,
+            'target',
+            options.target,
+            'release'
+        );
 
         // Build binary
         if (options.bin) {
@@ -118,18 +121,13 @@ export function build(options: BuildOptions): void {
             }
         }
 
-        let targetReleaseDir = path.join(
-            options.entry,
-            'target',
-            options.target,
-            'release'
-        );
-        const releaseDirExists = fs.existsSync(targetReleaseDir);
-
         if (shouldCompile) {
-            // Base arguments for `cargo check` and `cross build`
+            // Check if directory `./target/{{target}}/release` exists
+            const releaseDirExists = fs.existsSync(targetReleaseDir);
 
-            const buildArgs = [];
+            // Base arguments for `cargo-zigbuild`
+
+            const buildArgs = ['--quiet', '--color', 'always'];
 
             let extraBuildArgs =
                 options.extraBuildArgs || Settings.EXTRA_BUILD_ARGS;
@@ -153,28 +151,22 @@ export function build(options: BuildOptions): void {
                   }
                 : undefined;
 
-            // Run `cargo check` on an initial time, if needed
-            if (Settings.RUN_CARGO_CHECK && !_ranCargoCheck) {
-                _ranCargoCheck = true;
-                checkCode(options, buildArgs, buildEnv);
-            }
-
             if (releaseDirExists) {
                 console.log(`🍺  Building Rust code...`);
             } else {
                 // The `release` directory doesn't exist for the specified
-                // target. This is most likely an initial run, so `cross` will
-                // take much longer than usual to cross-compile the code.
+                // target. This is most likely an initial run, so `cargo-zigbuild`
+                // will take much longer than usual to cross-compile the code.
                 //
                 // Print out an informative message that the `build` step is
                 // expected to take longer than usual.
                 console.log(
-                    `🍺  Building Rust code with \`cross\`. This may take a few minutes...`
+                    `🍺  Building Rust code with \`cargo-zigbuild\`. This may take a few minutes...`
                 );
             }
 
             const args: string[] = [
-                'build',
+                'zigbuild',
                 '--release',
                 '--target',
                 options.target,
@@ -182,36 +174,19 @@ export function build(options: BuildOptions): void {
                 ...extra_args!,
             ];
 
-            // Pass compile-time environment variables into `cross build`.
-            // See <https://github.com/cross-rs/cross#passing-environment-variables-into-the-build-environment>.
-            let createdCrossTomlFile: boolean | undefined = undefined;
-            if (inputEnv) {
-                // Create and use a temporary `Cross.toml`, if needed
-                let filePath = pathToCrossToml(options.entry);
-                if (!fs.existsSync(filePath)) {
-                    createdCrossTomlFile = true;
-                    const fileContents = `[build.env]\npassthrough = ${JSON.stringify(
-                        Object.keys(inputEnv)
-                    )}`;
-                    fs.writeFileSync(filePath, fileContents);
-                }
-            }
-
-            const cross = spawnSync('cross', args, {
+            const zigBuild = spawnSync('cargo-zigbuild', args, {
                 cwd: options.entry,
                 env: buildEnv,
             });
 
-            if (createdCrossTomlFile) {
-                deleteFile(pathToCrossToml(options.entry));
-            }
-
-            if (cross.error) {
-                throw cross.error;
-            }
-
-            if (cross.status !== 0) {
-                throw new Error(cross.stderr.toString().trim());
+            if (zigBuild.status !== 0) {
+                console.error(zigBuild.stderr.toString().trim());
+                console.error(`💥  Run \`cargo zigbuild\` errored.`);
+                process.exit(1);
+                // Note: I don't want to raise an error here, as that will clutter the
+                // output with the stack trace here. But maybe, there's a way to
+                // suppress that?
+                // throw new Error(zigBuild.stderr.toString().trim());
             }
         }
 
@@ -224,70 +199,4 @@ export function build(options: BuildOptions): void {
             `Failed to build file at ${options.entry}: ${err}`
         );
     }
-}
-
-/**
- * Validate code with `cargo check`
- *
- * Note: this step is optional, and can be disabled with
- * `Settings.RUN_CARGO_CHECK` as needed.
- */
-export function checkCode(
-    options: BuildOptions,
-    buildArgs: string[],
-    buildEnv: NodeJS.ProcessEnv | undefined
-) {
-    let targetReleaseDir = path.join(
-        options.entry,
-        'target',
-        'release'
-    );
-    const releaseDirExists = fs.existsSync(targetReleaseDir);
-
-    if (!releaseDirExists) {
-        // The `release` directory doesn't exist for the specified
-        // target. This is most likely an initial run, so `cargo` will
-        // take much longer than usual to check the code.
-        //
-        // Print out an informative message that the `validate` step is
-        // expected to take longer than usual.
-        console.log(
-            `🧪  Checking code with \`cargo\`. This may take a few minutes...`
-        );
-    }
-
-    let start = performance.now();
-
-    const args: string[] = [
-        'check',
-        '--release',
-        ...buildArgs,
-        '--color',
-        'always',
-    ];
-
-    const check = spawnSync('cargo', args, {
-        cwd: options.entry,
-        env: buildEnv,
-    });
-
-    if (check.error) {
-        throw check.error;
-    }
-
-    if (check.status !== 0) {
-        console.error(check.stderr.toString().trim());
-        console.error(`💥  Run \`cargo check\` errored.`);
-        process.exit(1);
-        // Note: I don't want to raise an error here, as that will clutter the
-        // output with the stack trace here. But maybe, there's a way to
-        // suppress that?
-        // throw new Error(check.stderr.toString().trim());
-    }
-
-    logTime(start, `✅  Run \`cargo check\``);
-}
-
-function pathToCrossToml(entry: string): string {
-    return path.join(entry, 'Cross.toml');
 }

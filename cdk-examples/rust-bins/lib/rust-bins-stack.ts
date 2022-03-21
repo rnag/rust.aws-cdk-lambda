@@ -25,7 +25,7 @@ export class RustBinsStack extends Stack {
         // Settings.BUILD_INDIVIDUALLY = true;
 
         // Uncomment to cross-compile Rust code to a different Lambda architecture.
-        // Settings.TARGET = 'aarch64-unknown-linux-gnu';
+        // Settings.TARGET = 'x86_64-unknown-linux-gnu';
 
         const bucket = new s3.Bucket(this, 'RustBinsBucket', {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,

@@ -33,6 +33,16 @@ pub(crate) async fn my_handler(event: Request, ctx: Context) -> Response {
     // in the CDK code in the `lib/` folder.
     utils::log_enabled_features();
 
+    #[cfg(feature = "my-prod-feature")]
+    {
+        debug!("Now running in a PROD environment (my-prod-feature). Beep... Boop.");
+        let answer = systems::system_a::do_stuff_from_system_a();
+        info!(
+            "The answer to life, the universe, and everything is: {}",
+            answer
+        );
+    }
+
     let bucket_name = var("BUCKET_NAME")
         .expect("A BUCKET_NAME must be set in this app's Lambda environment variables.");
 

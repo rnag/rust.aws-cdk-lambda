@@ -34,7 +34,7 @@ export const Settings = {
      *
      * [official AWS documentation]: https://docs.aws.amazon.com/sdk-for-rust/latest/dg/lambda.html
      */
-    TARGET: 'x86_64-unknown-linux-gnu' as LAMBDA_TARGETS,
+    TARGET: 'aarch64-unknown-linux-gnu' as LAMBDA_TARGETS,
 
     /**
      * Custom Lambda Runtime, running on `Amazon Linux 2`
@@ -50,13 +50,6 @@ export const Settings = {
      * efficient approach.
      */
     BUILD_INDIVIDUALLY: false,
-
-    /**
-     * Whether to run `cargo check` to validate Rust code before building it with `cross`.
-     *
-     * Defaults to true.
-     */
-    RUN_CARGO_CHECK: true,
 
     /**
      * Default Log Level, for non-module libraries.
@@ -83,7 +76,7 @@ export const Settings = {
 
     /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
-     * build` or `cross build`.
+     * build` or `cargo-zigbuild`.
      *
      * Use environment variables to apply configuration changes, such
      * as test and production environment configurations, without changing your
@@ -94,8 +87,7 @@ export const Settings = {
     BUILD_ENVIRONMENT: undefined as NodeJS.ProcessEnv | undefined,
 
     /**
-     * Additional arguments that are passed in at build time to both
-     * `cargo check` and `cross build`.
+     * Additional arguments that are passed in at build time to `cargo-zigbuild`.
      *
      * ## Examples
      *
