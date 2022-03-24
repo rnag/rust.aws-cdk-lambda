@@ -1,6 +1,5 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
-import * as path from 'path';
 import { Settings } from '.';
 
 let _builtWorkspaces = false,
@@ -82,13 +81,6 @@ export function build(options: BuildOptions): void {
         let shouldCompile: boolean;
         let extra_args: string[] | undefined;
 
-        let targetReleaseDir = path.join(
-            options.entry,
-            'target',
-            options.target,
-            'release'
-        );
-
         // Build binary
         if (options.bin) {
             outputName = options.bin!;
@@ -123,7 +115,7 @@ export function build(options: BuildOptions): void {
 
         if (shouldCompile) {
             // Check if directory `./target/{{target}}/release` exists
-            const releaseDirExists = fs.existsSync(targetReleaseDir);
+            const releaseDirExists = fs.existsSync(options.outDir);
 
             // Base arguments for `cargo-zigbuild`
 
@@ -161,12 +153,15 @@ export function build(options: BuildOptions): void {
                 // Print out an informative message that the `build` step is
                 // expected to take longer than usual.
                 console.log(
-                    `🍺  Building Rust code with \`cargo-zigbuild\`. This may take a few minutes...`
+                    `🍺  Building Rust code with \`cargo-lambda\`. This may take a few minutes...`
                 );
             }
 
             const args: string[] = [
-                'zigbuild',
+                'lambda',
+                'build',
+                '--lambda-dir',
+                options.outDir,
                 '--release',
                 '--target',
                 options.target,
@@ -174,14 +169,14 @@ export function build(options: BuildOptions): void {
                 ...extra_args!,
             ];
 
-            const zigBuild = spawnSync('cargo-zigbuild', args, {
+            const cargo = spawnSync('cargo', args, {
                 cwd: options.entry,
                 env: buildEnv,
             });
 
-            if (zigBuild.status !== 0) {
-                console.error(zigBuild.stderr.toString().trim());
-                console.error(`💥  Run \`cargo zigbuild\` errored.`);
+            if (cargo.status !== 0) {
+                console.error(cargo.stderr.toString().trim());
+                console.error(`💥  Run \`cargo lambda\` errored.`);
                 process.exit(1);
                 // Note: I don't want to raise an error here, as that will clutter the
                 // output with the stack trace here. But maybe, there's a way to
@@ -189,11 +184,6 @@ export function build(options: BuildOptions): void {
                 // throw new Error(zigBuild.stderr.toString().trim());
             }
         }
-
-        let from = path.join(targetReleaseDir, outputName);
-        let to = path.join(options.outDir, 'bootstrap');
-
-        fs.copyFileSync(from, to);
     } catch (err) {
         throw new Error(
             `Failed to build file at ${options.entry}: ${err}`

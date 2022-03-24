@@ -77,25 +77,18 @@ export class RustFunction extends lambda.Function {
 
         const handlerDir = path.join(
             buildDir,
-            // We need to generate a *unique* hash in case there are multiple
-            // executables, so use the `binName` here instead.
-            crypto
-                .createHash('sha256')
-                .update(executable)
-                .digest('hex')
+            executable
         );
-        createDirectory(buildDir);
-        createDirectory(handlerDir);
 
         let start = performance.now();
 
-        // Build with `cargo-zigbuild`
+        // Build with `cargo-lambda`
         build({
             ...props,
             entry,
             bin: binName,
             target: target,
-            outDir: handlerDir,
+            outDir: buildDir,
         });
 
         logTime(start, `🎯  Cross-compile \`${executable}\``);
