@@ -42,6 +42,9 @@
         "aws-cdk-lib": "^2.0.0",
         "constructs": "^10.0.43"
     },
+    "optionalDependencies": {
+        "@ziglang/cli": "^0.0.8"
+    },
     "homepage": "https://github.com/rnag/rust.aws-cdk-lambda",
     "engines": {
         "node": ">= 10.3.0"

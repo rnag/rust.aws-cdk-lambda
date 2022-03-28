@@ -76,7 +76,7 @@ export const Settings = {
 
     /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
-     * build` or `cargo-zigbuild`.
+     * build` or `cargo lambda`.
      *
      * Use environment variables to apply configuration changes, such
      * as test and production environment configurations, without changing your
@@ -87,7 +87,7 @@ export const Settings = {
     BUILD_ENVIRONMENT: undefined as NodeJS.ProcessEnv | undefined,
 
     /**
-     * Additional arguments that are passed in at build time to `cargo-zigbuild`.
+     * Additional arguments that are passed in at build time to `cargo lambda`.
      *
      * ## Examples
      *

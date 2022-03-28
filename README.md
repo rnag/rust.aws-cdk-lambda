@@ -21,10 +21,10 @@
 
 This library provides a construct for a Rust Lambda function.
 
-It uses [`cargo-zigbuild`] under the hood, and follows best practices as outlined
+It uses [`cargo-lambda`] under the hood, and follows best practices as outlined
 in the [official AWS documentation].
 
-[`cargo-zigbuild`]: https://github.com/messense/cargo-zigbuild
+[`cargo-lambda`]: https://crates.io/crates/cargo-lambda
 [official aws documentation]: https://github.com/awslabs/aws-lambda-rust-runtime#building-and-deploying-your-lambda-functions
 
 ## Rust Function
@@ -33,10 +33,10 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
 
 ## Getting Started
 
-1. Install the [npm] package:
+1. Install this [npm] package, and [zig]:
 
     ```shell
-    $ npm i rust.aws-cdk-lambda
+    $ npm i rust.aws-cdk-lambda --save-optional
     ```
 
 2. Install the **aarch64-unknown-linux-gnu** toolchain with Rustup by running:
@@ -45,31 +45,16 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ rustup target add aarch64-unknown-linux-gnu
     ```
 
-3)  Install [Zig], using the instructions in their [installation guide] or via one of the options below.
-
-    1. Using [pip] (Python 3 required):
-
-        ```shell
-        $ pip install ziglang
-        ```
-
-    2. Using [npm]:
-
-        ```shell
-        $ npm install -g @ziglang/cli
-        ```
-
-4)  Use [`cargo`] to install _messense/cargo-zigbuild_:
+4)  Use [`cargo`] to install _cargo-lambda_:
 
     ```shell
-    $ cargo install cargo-zigbuild
+    $ cargo install cargo-lambda
     ```
 
 [npm]: https://nodejs.org/
 [pip]: https://pip.pypa.io/en/stable/
 [`cargo`]: https://www.rust-lang.org/
 [zig]: https://ziglang.org/
-[installation guide]: https://ziglang.org/learn/getting-started/#installing-zig
 
 ## Examples
 
@@ -120,9 +105,7 @@ All other properties of `lambda.Function` are supported, see also the [AWS Lambd
 
 When bundling the code, the `RustFunction` runs the following steps in order:
 
--   First it runs `cargo zigbuild`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **aarch64-unknown-linux-gnu** target, as mentioned above. Note that _zigbuild_ does initially confirm that the Rust code can compile.
-
--   Next, it copies the release app binary from the `target/` folder to a file named `bootstrap`, which the Lambda custom runtime environment looks for. It adds this new file under the _build directory_, which defaults to a `.build/` folder under the directory where `cdk` was invoked.
+-   First it runs `cargo lambda`, and passes in the `--release` and `--target` flags, so it compiles for a Lambda environment - which defaults to the **aarch64-unknown-linux-gnu** target, as mentioned above. Note that _cargo lambda_ does initially confirm that the Rust code can compile.
 
 -   The directory path to the executable is then passed in to `lambda.Code.fromAsset`, which creates a _zip file_ from the release binary asset.
 
@@ -132,7 +115,7 @@ If you instead prefer to use [Docker] and [`cross`] for deployment, as outlined
 in the [official AWS docs], you can install and use the [latest `v0.x`] release instead:
 
 ```shell
-$ npm i rust.aws-cdk-lambda@0.4.0
+$ npm i rust.aws-cdk-lambda@0.4.0 --save-optional
 ```
 
 [docker]: https://www.docker.com/get-started
@@ -294,8 +277,8 @@ Below lists some commonly used properties you can pass in to the `RustFunction` 
 | `setupLogging`     | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function.<br><br>The format defaults to `warn,module_name=debug`, which means that the default log level is `warn`, and the executable or library's log level is `debug`. |
 |                    |
 | `features`         | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                                                                                                                                                                     |
-| `buildEnvironment` | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo zigbuild`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                                                                                                                                                                     |
-| `extraBuildArgs`   | Additional arguments that are passed in at build time to `cargo zigbuild`. For example, [`--all-features`].                                                                                                                                                                                                                                                                                     |
+| `buildEnvironment` | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                                                                                                                                                                     |
+| `extraBuildArgs`   | Additional arguments that are passed in at build time to `cargo lambda`. For example, [`--all-features`].                                                                                                                                                                                                                                                                                     |
 
 ## Settings
 
@@ -314,5 +297,5 @@ Below are some useful _global_ defaults which can be set for all Rust Lambda Fun
 | `MODULE_LOG_LEVEL`   | Log Level for a module (i.e. the executable). Note that this value is only used when `RustFunctionProps.setupLogging` is enabled. Defaults to `debug`.                                                                                      |
 | `WORKSPACE_DIR`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
 | `FEATURES`           | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                 |
-| `BUILD_ENVIRONMENT`  | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo zigbuild`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                 |
-| `EXTRA_BUILD_ARGS`   | Additional arguments that are passed in at build time to both `cargo zigbuild`. For example, [`--all-features`].                                                                                                                            |
+| `BUILD_ENVIRONMENT`  | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                 |
+| `EXTRA_BUILD_ARGS`   | Additional arguments that are passed in at build time to both `cargo lambda`. For example, [`--all-features`].                                                                                                                            |

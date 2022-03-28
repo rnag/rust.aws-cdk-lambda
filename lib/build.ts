@@ -1,6 +1,5 @@
 import { spawnSync } from 'child_process';
 import * as fs from 'fs';
-import * as path from 'path';
 import { Settings } from '.';
 
 let _builtWorkspaces = false,
@@ -18,7 +17,7 @@ export interface BaseBuildProps {
     readonly package?: string;
 
     /**
-     * The target to use `cargo-zigbuild` to compile to.
+     * The target to use `cargo lambda` to compile to.
      *
      * Normally you'll need to first add the target to your toolchain:
      *    $ rustup target add <target>
@@ -45,7 +44,7 @@ export interface BaseBuildProps {
     readonly buildEnvironment?: NodeJS.ProcessEnv;
 
     /**
-     * Additional arguments that are passed in at build time to `cargo-zigbuild`.
+     * Additional arguments that are passed in at build time to `cargo lambda`.
      *
      * ## Examples
      *
@@ -74,20 +73,13 @@ export interface BuildOptions extends BaseBuildProps {
 }
 
 /**
- * Build with `cargo-zigbuild zigbuild`
+ * Build with `cargo lambda`
  */
 export function build(options: BuildOptions): void {
     try {
         let outputName: string;
         let shouldCompile: boolean;
         let extra_args: string[] | undefined;
-
-        let targetReleaseDir = path.join(
-            options.entry,
-            'target',
-            options.target,
-            'release'
-        );
 
         // Build binary
         if (options.bin) {
@@ -123,9 +115,9 @@ export function build(options: BuildOptions): void {
 
         if (shouldCompile) {
             // Check if directory `./target/{{target}}/release` exists
-            const releaseDirExists = fs.existsSync(targetReleaseDir);
+            const releaseDirExists = fs.existsSync(options.outDir);
 
-            // Base arguments for `cargo-zigbuild`
+            // Base arguments for `cargo lambda`
 
             const buildArgs = ['--quiet', '--color', 'always'];
 
@@ -155,18 +147,21 @@ export function build(options: BuildOptions): void {
                 console.log(`🍺  Building Rust code...`);
             } else {
                 // The `release` directory doesn't exist for the specified
-                // target. This is most likely an initial run, so `cargo-zigbuild`
+                // target. This is most likely an initial run, so `cargo lambda`
                 // will take much longer than usual to cross-compile the code.
                 //
                 // Print out an informative message that the `build` step is
                 // expected to take longer than usual.
                 console.log(
-                    `🍺  Building Rust code with \`cargo-zigbuild\`. This may take a few minutes...`
+                    `🍺  Building Rust code with \`cargo lambda\`. This may take a few minutes...`
                 );
             }
 
             const args: string[] = [
-                'zigbuild',
+                'lambda',
+                'build',
+                '--lambda-dir',
+                options.outDir,
                 '--release',
                 '--target',
                 options.target,
@@ -174,26 +169,21 @@ export function build(options: BuildOptions): void {
                 ...extra_args!,
             ];
 
-            const zigBuild = spawnSync('cargo-zigbuild', args, {
+            const cargo = spawnSync('cargo', args, {
                 cwd: options.entry,
                 env: buildEnv,
             });
 
-            if (zigBuild.status !== 0) {
-                console.error(zigBuild.stderr.toString().trim());
-                console.error(`💥  Run \`cargo zigbuild\` errored.`);
+            if (cargo.status !== 0) {
+                console.error(cargo.stderr.toString().trim());
+                console.error(`💥  Run \`cargo lambda\` errored.`);
                 process.exit(1);
                 // Note: I don't want to raise an error here, as that will clutter the
                 // output with the stack trace here. But maybe, there's a way to
                 // suppress that?
-                // throw new Error(zigBuild.stderr.toString().trim());
+                // throw new Error(cargo.stderr.toString().trim());
             }
         }
-
-        let from = path.join(targetReleaseDir, outputName);
-        let to = path.join(options.outDir, 'bootstrap');
-
-        fs.copyFileSync(from, to);
     } catch (err) {
         throw new Error(
             `Failed to build file at ${options.entry}: ${err}`
