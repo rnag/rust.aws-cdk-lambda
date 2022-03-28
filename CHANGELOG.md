@@ -11,6 +11,28 @@ Possible header types:
 
 ## [Unreleased]
 
+## v1.1.0 (2022-03-28)
+
+## Breaking Changes
+
+-   Switch to use [`cargo-lambda`] -- which abstracts away `cargo-zigbuild` -- for
+    building Rust code; technically this is not a _breaking_ change, but it **will** require
+    the package to be installed with `cargo`.
+
+[`cargo-lambda`]: https://crates.io/crates/cargo-lambda
+
+## Features
+
+-   [zig] can now be installed via the `--save-optional` flag when installing this package:
+    ```shell
+    npm i rust.aws-cdk-lambda --save-optional
+    ```
+-   The size of the _release_ binaries deployed to AWS Lambda should now be smaller, since `cargo-lambda` passes the [`-C strip`] argument as `symbols`.
+-   Remove existing logic to copy over binaries to the _build_ directory, as this should now be handled by `cargo-lambda` instead.
+
+[zig]: https://ziglang.org/
+[`-c strip`]: https://doc.rust-lang.org/stable/rustc/codegen-options/index.html#strip
+
 ## v1.0.0 (2022-03-21)
 
 ## Breaking Changes

@@ -33,7 +33,7 @@ export interface BaseBuildProps {
 
     /**
      * Key-value pairs that are passed in at compile time, i.e. to `cargo
-     * build` or `cargo zig-build`.
+     * build` or `cargo lambda`.
      *
      * Use environment variables to apply configuration changes, such
      * as test and production environment configurations, without changing your

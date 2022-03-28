@@ -45,7 +45,7 @@ The `RustFunction` construct creates a Lambda function with automatic bundling a
     $ rustup target add aarch64-unknown-linux-gnu
     ```
 
-4)  Use [`cargo`] to install _cargo-lambda_:
+3. Use [`cargo`] to install _cargo-lambda_:
 
     ```shell
     $ cargo install cargo-lambda
@@ -277,8 +277,8 @@ Below lists some commonly used properties you can pass in to the `RustFunction` 
 | `setupLogging`     | Determines whether we want to set up [library logging](https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html) - i.e. set the `RUST_LOG` environment variable - for the lambda function.<br><br>The format defaults to `warn,module_name=debug`, which means that the default log level is `warn`, and the executable or library's log level is `debug`. |
 |                    |
 | `features`         | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                                                                                                                                                                     |
-| `buildEnvironment` | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                                                                                                                                                                     |
-| `extraBuildArgs`   | Additional arguments that are passed in at build time to `cargo lambda`. For example, [`--all-features`].                                                                                                                                                                                                                                                                                     |
+| `buildEnvironment` | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                                                                                                                                                                       |
+| `extraBuildArgs`   | Additional arguments that are passed in at build time to `cargo lambda`. For example, [`--all-features`].                                                                                                                                                                                                                                                                                       |
 
 ## Settings
 
@@ -297,5 +297,5 @@ Below are some useful _global_ defaults which can be set for all Rust Lambda Fun
 | `MODULE_LOG_LEVEL`   | Log Level for a module (i.e. the executable). Note that this value is only used when `RustFunctionProps.setupLogging` is enabled. Defaults to `debug`.                                                                                      |
 | `WORKSPACE_DIR`      | Sets the root workspace directory. By default, the workspace directory is assumed to be the directory where `cdk` was invoked.<br><br>This directory should contain at the minimum a `Cargo.toml` file which defines the workspace members. |
 | `FEATURES`           | A list of features to activate when compiling Rust code. These must also be added to the `Cargo.toml` file.                                                                                                                                 |
-| `BUILD_ENVIRONMENT`  | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                 |
-| `EXTRA_BUILD_ARGS`   | Additional arguments that are passed in at build time to both `cargo lambda`. For example, [`--all-features`].                                                                                                                            |
+| `BUILD_ENVIRONMENT`  | Key-value pairs that are passed in at compile time, i.e. to `cargo build` or `cargo lambda`. This differs from `environment`, which determines the environment variables which are set on the AWS Lambda function itself.                   |
+| `EXTRA_BUILD_ARGS`   | Additional arguments that are passed in at build time to both `cargo lambda`. For example, [`--all-features`].                                                                                                                              |
