@@ -11,7 +11,7 @@ Possible header types:
 
 ## [Unreleased]
 
-## v1.1.2 (2022-03-28)
+## v1.1.3 (2022-03-28)
 
 ## Breaking Changes
 
