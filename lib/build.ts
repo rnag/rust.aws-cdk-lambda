@@ -17,7 +17,7 @@ export interface BaseBuildProps {
     readonly package?: string;
 
     /**
-     * The target to use `cargo-zigbuild` to compile to.
+     * The target to use `cargo lambda` to compile to.
      *
      * Normally you'll need to first add the target to your toolchain:
      *    $ rustup target add <target>
@@ -44,7 +44,7 @@ export interface BaseBuildProps {
     readonly buildEnvironment?: NodeJS.ProcessEnv;
 
     /**
-     * Additional arguments that are passed in at build time to `cargo-zigbuild`.
+     * Additional arguments that are passed in at build time to `cargo lambda`.
      *
      * ## Examples
      *
@@ -73,7 +73,7 @@ export interface BuildOptions extends BaseBuildProps {
 }
 
 /**
- * Build with `cargo-zigbuild zigbuild`
+ * Build with `cargo lambda`
  */
 export function build(options: BuildOptions): void {
     try {
@@ -117,7 +117,7 @@ export function build(options: BuildOptions): void {
             // Check if directory `./target/{{target}}/release` exists
             const releaseDirExists = fs.existsSync(options.outDir);
 
-            // Base arguments for `cargo-zigbuild`
+            // Base arguments for `cargo lambda`
 
             const buildArgs = ['--quiet', '--color', 'always'];
 
@@ -147,13 +147,13 @@ export function build(options: BuildOptions): void {
                 console.log(`🍺  Building Rust code...`);
             } else {
                 // The `release` directory doesn't exist for the specified
-                // target. This is most likely an initial run, so `cargo-zigbuild`
+                // target. This is most likely an initial run, so `cargo lambda`
                 // will take much longer than usual to cross-compile the code.
                 //
                 // Print out an informative message that the `build` step is
                 // expected to take longer than usual.
                 console.log(
-                    `🍺  Building Rust code with \`cargo-lambda\`. This may take a few minutes...`
+                    `🍺  Building Rust code with \`cargo lambda\`. This may take a few minutes...`
                 );
             }
 
@@ -181,7 +181,7 @@ export function build(options: BuildOptions): void {
                 // Note: I don't want to raise an error here, as that will clutter the
                 // output with the stack trace here. But maybe, there's a way to
                 // suppress that?
-                // throw new Error(zigBuild.stderr.toString().trim());
+                // throw new Error(cargo.stderr.toString().trim());
             }
         }
     } catch (err) {

@@ -50,7 +50,7 @@ export interface RustFunctionProps
 }
 
 /**
- * A Rust Lambda function built using `cargo-zigbuild`
+ * A Rust Lambda function built using `cargo lambda`
  */
 export class RustFunction extends lambda.Function {
     constructor(
