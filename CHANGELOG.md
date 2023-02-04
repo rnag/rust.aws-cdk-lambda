@@ -11,9 +11,36 @@ Possible header types:
 
 ## [Unreleased]
 
+## v1.2.0 (2023-02-03)
+
+### Bug Fixes
+
+-   `RustFunction` should not execute `cargo lambda` when certain `cdk` sub-commands are invoked, such as:
+    -   `destroy`
+    -   `list`
+    -   etc.
+-   _Potential_ bug-fix (unconfirmed): The library should not execute `cargo lambda` when a project has multiple stacks, and the stack being deployed doesn't include any `RustFunction` constructs.
+
+### Features
+
+-   Add parameters to `Settings`:
+    -   `SKIP_BUILD`
+-   Update docs to mention how to _skip_ the build step by passing in the `build` context flag when invoking a `cdk` command.
+
+    For example:
+
+    ```shell
+    cdk synth -c build=0
+    ```
+
+-   Update developer docs used for local testing, as I determined a newish approach with `npm link` can be used, as outlined in [this article].
+-   Enable `swc` in all sample CDK apps, in order to improve the overall [performance of `ts-node`](https://typestrong.org/ts-node/docs/performance) when `cdk` is run.
+
+[this article]: https://stackoverflow.com/a/18778516/10237506
+
 ## v1.1.3 (2022-03-28)
 
-## Breaking Changes
+### Breaking Changes
 
 -   Switch to use [`cargo-lambda`] -- which abstracts away `cargo-zigbuild` -- for
     building Rust code; technically this is not a _breaking_ change, but it **will** require
@@ -21,7 +48,7 @@ Possible header types:
 
 [`cargo-lambda`]: https://crates.io/crates/cargo-lambda
 
-## Features
+### Features
 
 -   [zig] can now be installed via the `--save-optional` flag when installing this package:
     ```shell
@@ -35,7 +62,7 @@ Possible header types:
 
 ## v1.0.0 (2022-03-21)
 
-## Breaking Changes
+### Breaking Changes
 
 -   Switch to use [`cargo-zigbuild`] -- instead of `cross` -- for building Rust code.
 -   Switch the default build architecture from `x86_64` to `arm64`; this package now uses **aarch64-unknown-linux-gnu** as the default build target for AWS Lambda functions, mainly as I've found this architecture to be slightly more performant in general use cases.

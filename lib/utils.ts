@@ -23,7 +23,7 @@ export interface CargoTomlProps {
     };
 }
 
-export function asBool(value: any, defaultValue: string = 'T') {
+export function asBool(value: any, defaultValue: string = 'F') {
     return truthyValues.includes(
         (value ?? defaultValue).toUpperCase()
     );
