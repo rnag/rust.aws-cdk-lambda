@@ -25,14 +25,10 @@ Possible header types:
 
 -   Add parameters to `Settings`:
     -   `SKIP_BUILD`
--   Update docs to mention how to _skip_ the build step by passing in the `build` context flag when invoking a `cdk` command.
-
-    For example:
-
+-   Update docs to mention how to _skip_ the build step by passing in the `build` context flag when invoking a `cdk` command. For example:
     ```shell
     cdk synth -c build=0
     ```
-
 -   Update developer docs used for local testing, as I determined a newish approach with `npm link` can be used, as outlined in [this article].
 -   Enable `swc` in all sample CDK apps, in order to improve the overall [performance of `ts-node`](https://typestrong.org/ts-node/docs/performance) when `cdk` is run.
 
