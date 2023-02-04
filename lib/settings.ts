@@ -1,5 +1,6 @@
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as path from 'path';
+import { Runtime } from 'aws-cdk-lib/aws-lambda';
+import { join } from 'path';
+import { cwd } from 'process';
 
 // These are the valid cross-compile targets for AWS Lambda.
 //
@@ -20,13 +21,13 @@ export const Settings = {
      * default, the construct will use directory where `cdk` was invoked as
      * the directory where Cargo files are located.
      */
-    ENTRY: process.cwd(),
+    ENTRY: cwd(),
 
     /**
      * Default Build directory, which defaults to a `.build` folder under the
      * project's root directory.
      */
-    BUILD_DIR: path.join(process.cwd(), '.build'),
+    BUILD_DIR: join(cwd(), '.build'),
 
     /**
      * Build target to cross-compile to. Defaults to the target for Amazon
@@ -39,7 +40,7 @@ export const Settings = {
     /**
      * Custom Lambda Runtime, running on `Amazon Linux 2`
      */
-    RUNTIME: lambda.Runtime.PROVIDED_AL2,
+    RUNTIME: Runtime.PROVIDED_AL2,
 
     /**
      * Whether to build each executable individually, either via `--bin` or
@@ -97,6 +98,19 @@ export const Settings = {
     EXTRA_BUILD_ARGS: undefined as string[] | undefined,
 
     /**
+     * Whether to skip building Rust Lambdas -- e.g. skip
+     * the compile step with `cargo lambda`.
+     *
+     * Alternatively, this can be set in the `build`
+     * context, when invoking `cdk` -- for example:
+     *
+     *   ```console
+     *   cdk deploy -c build=[T | true | 1 | Y | yes | ok | on]
+     *   ```
+     */
+    SKIP_BUILD: undefined as boolean | undefined,
+
+    /**
      * Sets the root workspace directory. By default, the workspace directory
      * is assumed to be the directory where `cdk` was invoked.
      *
@@ -110,7 +124,7 @@ export const Settings = {
      *
      */
     set WORKSPACE_DIR(folder: string) {
-        this.ENTRY = path.join(this.ENTRY, folder);
+        this.ENTRY = join(this.ENTRY, folder);
     },
 
     /**
