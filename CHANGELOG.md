@@ -11,6 +11,12 @@ Possible header types:
 
 ## [Unreleased]
 
+## v1.2.1 (2023-02-03)
+
+### Bug Fixes
+
+-   Fix: `Settings.SKIP_BUILD` should not default to `true`
+
 ## v1.2.0 (2023-02-03)
 
 ### Bug Fixes

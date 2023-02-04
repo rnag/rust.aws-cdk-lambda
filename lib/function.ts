@@ -96,7 +96,7 @@ export class RustFunction extends Function {
         if (Settings.SKIP_BUILD === undefined)
             Settings.SKIP_BUILD = !asBool(
                 scope.node.tryGetContext('build'),
-                'F'
+                'T'
             );
 
         // Build with `cargo-lambda`
