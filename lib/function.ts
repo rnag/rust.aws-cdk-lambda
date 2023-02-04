@@ -1,13 +1,19 @@
-import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Stack } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as crypto from 'crypto';
-import * as path from 'path';
+import { join } from 'path';
 import { performance } from 'perf_hooks';
 import { Settings } from '.';
 import { BaseBuildProps, build } from './build';
+// import { Bundling } from './bundling';
+import {
+    Code,
+    Function,
+    FunctionOptions,
+} from 'aws-cdk-lib/aws-lambda';
 import { LAMBDA_TARGETS } from './settings';
 import {
-    createDirectory,
+    asBool,
+    ensureDirExists,
     getPackageName,
     lambdaArchitecture,
     logTime,
@@ -17,7 +23,7 @@ import {
  * Properties for a RustFunction
  */
 export interface RustFunctionProps
-    extends lambda.FunctionOptions,
+    extends FunctionOptions,
         BaseBuildProps {
     /**
      * Path to directory with Cargo.toml
@@ -52,7 +58,7 @@ export interface RustFunctionProps
 /**
  * A Rust Lambda function built using `cargo lambda`
  */
-export class RustFunction extends lambda.Function {
+export class RustFunction extends Function {
     constructor(
         scope: Construct,
         id: string,
@@ -75,23 +81,44 @@ export class RustFunction extends lambda.Function {
             executable = binName;
         }
 
-        const handlerDir = path.join(
-            buildDir,
-            executable
-        );
+        const handlerDir = join(buildDir, executable);
 
-        let start = performance.now();
+        // Check if we really need to build with `cargo-lambda`.
+
+        // In certain cases, such as calling `cdk destroy`
+        // or `cdk list`, the compile step should not run.
+        const thisStack = Stack.of(scope);
+        const shouldBuild = thisStack.bundlingRequired;
+
+        // Check if `build` context value is passed in
+        // to command-line. For example:
+        //     $ cdk deploy -c build=no
+        if (Settings.SKIP_BUILD === undefined)
+            Settings.SKIP_BUILD = !asBool(
+                scope.node.tryGetContext('build'),
+                'F'
+            );
 
         // Build with `cargo-lambda`
-        build({
-            ...props,
-            entry,
-            bin: binName,
-            target: target,
-            outDir: buildDir,
-        });
+        if (shouldBuild && !Settings.SKIP_BUILD) {
+            let start = performance.now();
 
-        logTime(start, `🎯  Cross-compile \`${executable}\``);
+            build({
+                ...props,
+                entry,
+                bin: binName,
+                target: target,
+                outDir: buildDir,
+            });
+
+            logTime(start, `🎯  Cross-compile \`${executable}\``);
+        }
+        // Else, skip the build (or bundle) step.
+        //
+        // At a minimum, we need to ensure the output directory
+        // exists -- otherwise, CDK complains that it can't
+        // locate the asset.
+        else ensureDirExists(handlerDir);
 
         let lambdaEnv = props.environment;
         // Sets up logging if needed.
@@ -109,7 +136,12 @@ export class RustFunction extends lambda.Function {
             ...props,
             runtime: Settings.RUNTIME,
             architecture: arch,
-            code: lambda.Code.fromAsset(handlerDir),
+            code: Code.fromAsset(handlerDir),
+            // code: Bundling.bundle({
+            //     handlerDir,
+            //     runtime: Settings.RUNTIME,
+            //     architecture: arch,
+            // }),
             handler: handler,
             environment: lambdaEnv,
         });

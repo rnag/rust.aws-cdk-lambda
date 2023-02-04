@@ -64,6 +64,8 @@ echo '\n# Rust lambda build directory\n.build' >> .gitignore
 
 ## Local Development and Testing
 
+> _Note_: See the [New Approach](#new-approach) below which obviates the need to update the `import` statements.
+
 In case it's desirable to uncomment the following import in the `lib/` folder of a sample CDK app, for local testing purposes:
 
 ```ts
@@ -86,4 +88,54 @@ For example, here are the important ones you'd need to verify:
 ├── aws-cdk-lib@2.12.0
 ├── aws-cdk@2.12.0
 ├── constructs@10.0.65
+```
+
+### New Approach
+
+As per [this article](https://stackoverflow.com/a/18778516/10237506) I found that explains how a local module can be installed with `npm link`, this is a slightly different approach to commenting out and then un-commenting an `import` statement as mentioned above.
+
+This does also have a few unavoidable side-effects, but hopefully such a method should yield an overall better (developer) experience.
+
+Here then, is the updated approach which leverages `npm link` under the hood to locally install an NPM module.
+
+First, `cd` into the local directory of a sample CDK app.
+
+Within this folder, run the npm script `link` (alias: `l`) to automatically link to the local `rust.aws-cdk-lambda` module -- i.e. the project folder two levels up:
+
+```shell
+npm run l
+```
+
+If all is well, you should see that the _linking_ is successful.
+
+To confirm:
+
+```shell
+npm list
+```
+
+The result should be something like:
+
+```plaintext
+...
+├── rust.aws-cdk-lambda@1.2.0 -> ./../..
+...
+```
+
+That means everything is set up correctly! CDK code should reference the definitions under `../../dist/`, i.e. under the root folder.
+
+Next -- open a new terminal window, and from the project root folder `$root`, run the following command:
+
+```shell
+npm run watch
+```
+
+This will listen for any changes to the project TypeScript code, and automatically run `tsc` to down-compile it to JS code, which it places in the `dist/` folder.
+
+These changes will also be reflected in the sample CDK project, thanks to `npm link` which was run earlier.
+
+To _unlink_ the local module and use the remote one installed as a dependency listed in the `package.json`, simply run the following from the root of a sample CDK app:
+
+```shell
+npm run ul
 ```

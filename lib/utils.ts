@@ -1,9 +1,16 @@
 import { Architecture } from 'aws-cdk-lib/aws-lambda';
-import * as fs from 'fs';
-import * as path from 'path';
+import {
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    writeFileSync,
+} from 'fs';
+import { join } from 'path';
 import { performance } from 'perf_hooks';
 import * as toml from 'toml';
 import { LAMBDA_TARGETS } from './settings';
+
+const truthyValues = ['T', 'TRUE', 'OK', 'ON', '1', 'Y', 'YES'];
 
 /**
  * Base layout of a `Cargo.toml` file in a Rust project
@@ -16,31 +23,35 @@ export interface CargoTomlProps {
     };
 }
 
+export function asBool(value: any, defaultValue: string = 'F') {
+    return truthyValues.includes(
+        (value ?? defaultValue).toUpperCase()
+    );
+}
+
 export function logTime(start: number, message: string) {
     const elapsedSec = ((performance.now() - start) / 1000).toFixed(
-        2
+        6
     );
     console.log(`${message}: ${elapsedSec}s`);
 }
 
-export function createDirectory(dir: string) {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
+export function ensureDirExists(dir: string, recursive = true) {
+    if (!existsSync(dir)) mkdirSync(dir, { recursive });
 }
 
 export function createFile(filePath: string, data: string) {
-    if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, data);
+    if (!existsSync(filePath)) {
+        writeFileSync(filePath, data);
     }
 }
 
 export function getPackageName(entry: string) {
-    const tomlFilePath = path.join(entry, 'Cargo.toml');
+    const tomlFilePath = join(entry, 'Cargo.toml');
     // console.trace(`Parsing TOML file at ${tomlFilePath}`);
 
     try {
-        const contents = fs.readFileSync(tomlFilePath, 'utf8');
+        const contents = readFileSync(tomlFilePath, 'utf8');
         let data: CargoTomlProps = toml.parse(contents);
         return data.package.name;
     } catch (err) {

@@ -1,5 +1,5 @@
 import { spawnSync } from 'child_process';
-import * as fs from 'fs';
+import { existsSync } from 'fs';
 import { Settings } from '.';
 
 let _builtWorkspaces = false,
@@ -115,7 +115,7 @@ export function build(options: BuildOptions): void {
 
         if (shouldCompile) {
             // Check if directory `./target/{{target}}/release` exists
-            const releaseDirExists = fs.existsSync(options.outDir);
+            const releaseDirExists = existsSync(options.outDir);
 
             // Base arguments for `cargo lambda`
 

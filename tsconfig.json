@@ -8,5 +8,5 @@
         "strict": true,
         "esModuleInterop": true
     },
-    "exclude": ["test", "cdk-examples"]
+    "exclude": ["test", "cdk-examples", "dist"]
 }
