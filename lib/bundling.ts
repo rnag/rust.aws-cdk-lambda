@@ -6,16 +6,24 @@ import {
     Code,
     Runtime,
 } from 'aws-cdk-lib/aws-lambda';
-import { dirname } from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
+import { build } from './build';
 
 /**
  * Options for bundling
  */
 export interface BundlingProps extends DockerRunOptions {
     /**
-     * CDK output (staging) directory for the lambda function
+     * Path to the directory that contains the project to be built; i.e., the
+     * directory containing `Cargo.toml`.
      */
-    readonly handlerDir: string;
+    readonly entry: string;
+
+    /**
+     * Executable name.
+     */
+    readonly bin?: string;
 
     /**
      * The runtime of the lambda function
@@ -26,6 +34,11 @@ export interface BundlingProps extends DockerRunOptions {
      * The system architecture of the lambda function
      */
     readonly architecture: Architecture;
+
+    /**
+     * Target of `cargo build`.
+     */
+    readonly target: string;
 }
 
 /**
@@ -35,7 +48,7 @@ export class Bundling implements cdk.BundlingOptions {
     public static bundle(options: BundlingProps): AssetCode {
         const bundling = new Bundling(options);
 
-        return Code.fromAsset(dirname(options.handlerDir), {
+        return Code.fromAsset(options.entry, {
             assetHashType: cdk.AssetHashType.OUTPUT,
             bundling: {
                 image: bundling.image,
@@ -54,9 +67,22 @@ export class Bundling implements cdk.BundlingOptions {
         this.image = cdk.DockerImage.fromRegistry('dummy'); // Do not build if we don't need to
 
         this.local = {
-            tryBundle(outputDir: string) {
-                // TODO
-                console.log(`BUNDLING...: ${outputDir}`);
+            tryBundle(outDir: string) {
+                console.log(`BUNDLING...: ${outDir}`);
+                build({
+                    entry: props.entry,
+                    bin: props.bin,
+                    target: props.target,
+                    outDir,
+                });
+                // moves <bin>/bootstrap → ./bootstrap
+                // and cleans up the empty folder
+                const binDir = path.join(outDir, props.bin!);
+                fs.renameSync(
+                  path.join(binDir, 'bootstrap'),
+                  path.join(outDir, 'bootstrap')
+                );
+                fs.rmdirSync(binDir);
 
                 return true;
             },

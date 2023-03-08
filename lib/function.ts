@@ -3,8 +3,8 @@ import { Construct } from 'constructs';
 import { join } from 'path';
 import { performance } from 'perf_hooks';
 import { Settings } from '.';
-import { BaseBuildProps, build } from './build';
-// import { Bundling } from './bundling';
+import { BaseBuildProps } from './build';
+import { Bundling } from './bundling';
 import {
     Code,
     Function,
@@ -99,27 +99,6 @@ export class RustFunction extends Function {
                 'T'
             );
 
-        // Build with `cargo-lambda`
-        if (shouldBuild && !Settings.SKIP_BUILD) {
-            let start = performance.now();
-
-            build({
-                ...props,
-                entry,
-                bin: binName,
-                target: target,
-                outDir: buildDir,
-            });
-
-            logTime(start, `🎯  Cross-compile \`${executable}\``);
-        }
-        // Else, skip the build (or bundle) step.
-        //
-        // At a minimum, we need to ensure the output directory
-        // exists -- otherwise, CDK complains that it can't
-        // locate the asset.
-        else ensureDirExists(handlerDir);
-
         let lambdaEnv = props.environment;
         // Sets up logging if needed.
         //   Ref: https://rust-lang-nursery.github.io/rust-cookbook/development_tools/debugging/config_log.html
@@ -136,12 +115,13 @@ export class RustFunction extends Function {
             ...props,
             runtime: Settings.RUNTIME,
             architecture: arch,
-            code: Code.fromAsset(handlerDir),
-            // code: Bundling.bundle({
-            //     handlerDir,
-            //     runtime: Settings.RUNTIME,
-            //     architecture: arch,
-            // }),
+            code: Bundling.bundle({
+                entry,
+                bin: binName,
+                runtime: Settings.RUNTIME,
+                architecture: arch,
+                target,
+            }),
             handler: handler,
             environment: lambdaEnv,
         });
