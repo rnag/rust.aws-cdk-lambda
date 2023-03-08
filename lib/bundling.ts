@@ -6,9 +6,12 @@ import {
     Code,
     Runtime,
 } from 'aws-cdk-lib/aws-lambda';
+import { spawnSync } from 'child_process';
 import * as fs from 'fs';
+import * as os from 'os';
 import * as path from 'path';
-import { build } from './build';
+import { Settings } from '.';
+import { createBuildCommand } from './build';
 
 /**
  * Options for bundling
@@ -64,6 +67,18 @@ export interface BundlingProps extends DockerRunOptions {
      * Target of `cargo build`.
      */
     readonly target: string;
+
+    /**
+     * Key-value pairs that are passed in at compile time, i.e. to `cargo
+     * build` or `cargo lambda`.
+     *
+     * Use environment variables to apply configuration changes, such
+     * as test and production environment configurations, without changing your
+     * Lambda function source code.
+     *
+     * @default - No environment variables.
+     */
+    readonly buildEnvironment?: NodeJS.ProcessEnv;
 }
 
 /**
@@ -92,24 +107,39 @@ export class Bundling implements cdk.BundlingOptions {
 
         this.image = cdk.DockerImage.fromRegistry('dummy'); // Do not build if we don't need to
 
+        const osPlatform = os.platform();
         this.local = {
+            // reference: https://github.com/aws/aws-cdk/blob/1ca3e0027323e84aacade4d9bd058bbc5687a7ab/packages/%40aws-cdk/aws-lambda-go/lib/bundling.ts#L174-L199
             tryBundle(outDir: string) {
                 console.log(`BUNDLING...: ${outDir}`);
-                build({
+                const buildCommand = createBuildCommand({
                     entry: props.entry,
                     bin: props.bin,
                     target: props.target,
                     outDir,
+                    targetPlatform: osPlatform,
                 });
-                // moves <bin>/bootstrap → ./bootstrap
-                // and cleans up the empty folder
-                const binDir = path.join(outDir, props.bin!);
-                fs.renameSync(
-                  path.join(binDir, 'bootstrap'),
-                  path.join(outDir, 'bootstrap')
+                const inputEnv =
+                    props.buildEnvironment ||
+                    Settings.BUILD_ENVIRONMENT;
+                console.log('Running:', buildCommand);
+                const cargo = spawnSync(
+                    osPlatform === 'win32' ? 'cmd' : 'bash',
+                    [
+                        osPlatform === 'win32' ? '/c' : '-c',
+                        buildCommand,
+                    ],
+                    {
+                        env: { ...process.env, ...inputEnv ?? {} },
+                        cwd: props.entry,
+                        windowsVerbatimArguments: osPlatform === 'win32',
+                    },
                 );
-                fs.rmdirSync(binDir);
-
+                if (cargo.status !== 0) {
+                    console.error(cargo.stderr.toString().trim());
+                    console.error(`💥  Run \`cargo lambda\` errored.`);
+                    process.exit(1);
+                }
                 return true;
             },
         };
