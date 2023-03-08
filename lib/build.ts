@@ -1,5 +1,7 @@
 import { spawnSync } from 'child_process';
 import { existsSync } from 'fs';
+import * as os from 'os';
+import * as path from 'path';
 import { Settings } from '.';
 
 let _builtWorkspaces = false,
@@ -70,6 +72,104 @@ export interface BuildOptions extends BaseBuildProps {
 
     // Makes this property *required*
     readonly target: string;
+
+    /**
+     * Target platform.
+     */
+    readonly targetPlatform: NodeJS.Platform;
+}
+
+/**
+ * Creates a command to build with `cargo lambda`.
+ *
+ * @remarks
+ *
+ * Execute a returned command with `bash` on Linux/macOS, or `cmd` on Win32.
+ */
+export function createBuildCommand(options: BuildOptions): string {
+    // reference: https://github.com/aws/aws-cdk/blob/1ca3e0027323e84aacade4d9bd058bbc5687a7ab/packages/%40aws-cdk/aws-lambda-go/lib/bundling.ts#L228-L237
+    const pathJoin = (...paths: string[]) => {
+        const joined: string = path.join(...paths);
+        // if we are on win32 but need posix style paths
+        if (os.platform() === 'win32' && options.targetPlatform !== 'win32') {
+            return joined.replace(/\\/g, '/');
+        }
+        return joined;
+    };
+
+    let outputName: string;
+    let extra_args: string[] | undefined;
+
+    // Build binary
+    if (options.bin) {
+        outputName = options.bin!;
+        if (Settings.BUILD_INDIVIDUALLY) {
+            extra_args = ['--bin', outputName];
+        } else {
+            extra_args = ['--bins'];
+        }
+    }
+    // Build package - i.e. workspace member
+    else {
+        outputName = options.package!;
+        if (Settings.BUILD_INDIVIDUALLY) {
+            extra_args = ['--package', outputName];
+        } else {
+            extra_args = ['--workspace'];
+        }
+    }
+    // Base arguments for `cargo lambda`
+    const buildArgs = ['--quiet', '--color', 'always'];
+
+    let extraBuildArgs = options.extraBuildArgs || Settings.EXTRA_BUILD_ARGS;
+    let features = options.features || Settings.FEATURES;
+
+    if (extraBuildArgs) {
+        buildArgs.push(...extraBuildArgs);
+    }
+    if (features) {
+        buildArgs.push('--features', features.join(','));
+    }
+
+    // constructs build commands
+    // - runs `cargo lambda`
+    const buildDir = pathJoin(options.outDir, '.build');
+    const cargoCommand: string = [
+        'cargo',
+        'lambda',
+        'build',
+        '--lambda-dir',
+        buildDir,
+        '--release',
+        '--target',
+        options.target,
+        ...buildArgs,
+        ...extra_args!,
+    ].join(' ');
+
+    // - moves artifact: outDir/.build/<outputName>/bootstrap → outDir/bootstrap
+    const artifactDir = pathJoin(buildDir, outputName);
+    const moveCommand: string = [
+        options.targetPlatform === 'win32' ? 'move' : 'mv',
+        pathJoin(artifactDir, 'bootstrap'),
+        pathJoin(options.outDir, 'bootstrap'),
+    ].join(' ');
+
+    // - cleans up the build directory
+    const cleanupCommand: string = options.targetPlatform === 'win32'
+        ? ['rmdir', '/s', '/q', buildDir].join(' ')
+        : ['rm', '-rf', buildDir].join(' ');
+
+    return chain([
+        cargoCommand,
+        moveCommand,
+        cleanupCommand,
+    ]);
+}
+
+// reference: https://github.com/aws/aws-cdk/blob/1ca3e0027323e84aacade4d9bd058bbc5687a7ab/packages/%40aws-cdk/aws-lambda-go/lib/bundling.ts#L239-L241
+function chain(commands: string[]): string {
+    return commands.join(' && ');
 }
 
 /**
