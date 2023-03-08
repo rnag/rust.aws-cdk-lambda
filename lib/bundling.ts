@@ -1,5 +1,5 @@
 import * as cdk from 'aws-cdk-lib';
-import { DockerRunOptions } from 'aws-cdk-lib';
+import { AssetHashType, DockerRunOptions } from 'aws-cdk-lib';
 import {
     Architecture,
     AssetCode,
@@ -14,6 +14,31 @@ import { build } from './build';
  * Options for bundling
  */
 export interface BundlingProps extends DockerRunOptions {
+    /**
+     * Determines how the asset hash is calculated.
+     *
+     * @remarks
+     *
+     * This property is set to `AssetHashType.SOURCE` to prevent the costly Rust
+     * compiler from running when there is no change in the source files.
+     *
+     * If your asset depends on files outside `entity`, you have to specify
+     * a type other than `AssetHashType.SOURCE`.
+     *
+     * @default - {@link https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.AssetHashType.html#source | AssetHashType.SOURCE}
+     */
+    readonly assetHashType?: AssetHashType;
+
+    /**
+     * Custom asset hash.
+     *
+     * @remarks
+     *
+     * This property is meaningful if and only if `assetHashType` is
+     * `AssetHashType.CUSTOM`.
+     */
+    readonly assetHash?: string;
+
     /**
      * Path to the directory that contains the project to be built; i.e., the
      * directory containing `Cargo.toml`.
@@ -49,7 +74,8 @@ export class Bundling implements cdk.BundlingOptions {
         const bundling = new Bundling(options);
 
         return Code.fromAsset(options.entry, {
-            assetHashType: cdk.AssetHashType.OUTPUT,
+            assetHashType: options.assetHashType ?? cdk.AssetHashType.SOURCE,
+            assetHash: options.assetHash,
             bundling: {
                 image: bundling.image,
                 local: bundling.local,
