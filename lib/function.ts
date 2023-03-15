@@ -35,6 +35,9 @@ export interface RustFunctionProps
     /**
      * The build directory
      *
+     * @deprecated build directory is no longer used because the CDK prepares
+     * one for bundling.
+     *
      * @default - `.build` in the entry file directory
      */
     readonly buildDir?: string;
@@ -53,6 +56,13 @@ export interface RustFunctionProps
      * `RUST_LOG` environment variable - for the lambda function.
      */
     readonly setupLogging?: boolean;
+
+    /**
+     * Forces bundling in a Docker container even if local bundling is possible.
+     *
+     * @default - false
+     */
+    readonly forcedDockerBundling?: boolean;
 }
 
 /**
@@ -69,7 +79,6 @@ export class RustFunction extends Function {
         const target =
             <LAMBDA_TARGETS>props.target || Settings.TARGET;
         const arch = props.architecture || lambdaArchitecture(target);
-        const buildDir = props.buildDir || Settings.BUILD_DIR;
 
         let executable: string;
         let binName: string | undefined;
@@ -80,8 +89,6 @@ export class RustFunction extends Function {
             binName = props.bin || getPackageName(entry);
             executable = binName;
         }
-
-        const handlerDir = join(buildDir, executable);
 
         // Check if we really need to build with `cargo-lambda`.
 
@@ -121,6 +128,7 @@ export class RustFunction extends Function {
                 runtime: Settings.RUNTIME,
                 architecture: arch,
                 target,
+                forcedDockerBundling: props.forcedDockerBundling,
             }),
             handler: handler,
             environment: lambdaEnv,

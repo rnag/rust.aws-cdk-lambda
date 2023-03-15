@@ -43,7 +43,7 @@ export interface BaseBuildProps {
      *
      * @default - No environment variables.
      */
-    readonly buildEnvironment?: NodeJS.ProcessEnv;
+    readonly buildEnvironment?: { [key:string]: string };
 
     /**
      * Additional arguments that are passed in at build time to `cargo lambda`.

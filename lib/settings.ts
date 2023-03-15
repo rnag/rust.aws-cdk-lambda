@@ -85,7 +85,7 @@ export const Settings = {
      *
      * @default - No environment variables.
      */
-    BUILD_ENVIRONMENT: undefined as NodeJS.ProcessEnv | undefined,
+    BUILD_ENVIRONMENT: undefined as { [key:string]: string } | undefined,
 
     /**
      * Additional arguments that are passed in at build time to `cargo lambda`.
