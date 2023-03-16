@@ -12,6 +12,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { Settings } from '.';
 import { createBuildCommand } from './build';
+import { getCargoLambdaVersion } from './utils';
 
 /**
  * Options for bundling
@@ -108,6 +109,9 @@ export class Bundling implements cdk.BundlingOptions {
         });
     }
 
+    // Whether `cargo lambda` is available.
+    private static runsLocally?: boolean;
+
     // Core bundling options
     public readonly image: cdk.DockerImage;
     public readonly command: string[];
@@ -116,11 +120,15 @@ export class Bundling implements cdk.BundlingOptions {
     public readonly local?: cdk.ILocalBundling;
 
     constructor(private readonly props: BundlingProps) {
+        Bundling.runsLocally = Bundling.runsLocally
+            ?? getCargoLambdaVersion()
+            ?? false;
+
         const inputEnv = props.buildEnvironment || Settings.BUILD_ENVIRONMENT;
 
         // Docker bundling
         // reference: https://github.com/aws/aws-cdk/blob/9bd507842f567ee3e450c3f44e5c3dccc7c42ae6/packages/%40aws-cdk/aws-lambda-go/lib/bundling.ts#L143-L165
-        const shouldBuildImage = props.forcedDockerBundling;
+        const shouldBuildImage = props.forcedDockerBundling || !Bundling.runsLocally;
         this.image = shouldBuildImage
             ? cdk.DockerImage.fromBuild(path.join(__dirname, '../lib'), {
                 // intentionally omits the platform to always use the native
@@ -148,6 +156,10 @@ export class Bundling implements cdk.BundlingOptions {
             this.local = {
                 // reference: https://github.com/aws/aws-cdk/blob/1ca3e0027323e84aacade4d9bd058bbc5687a7ab/packages/%40aws-cdk/aws-lambda-go/lib/bundling.ts#L174-L199
                 tryBundle(outDir: string) {
+                    if (Bundling.runsLocally == false) {
+                        process.stderr.write('cargo lambda cannot run locally. Switching to Docker bundling.\n');
+                        return false;
+                    }
                     console.log(`BUNDLING...: ${outDir}`);
                     const buildCommand = createBuildCommand({
                         entry: props.entry,

@@ -1,4 +1,5 @@
 import { Architecture } from 'aws-cdk-lib/aws-lambda';
+import { spawnSync } from 'child_process';
 import {
     existsSync,
     mkdirSync,
@@ -70,4 +71,19 @@ export function lambdaArchitecture(
     return target.startsWith('x86_64')
         ? Architecture.X86_64
         : Architecture.ARM_64;
+}
+
+export function getCargoLambdaVersion(): boolean | undefined {
+    try {
+        const cargo = spawnSync('cargo', ['lambda', '--version']);
+        if (cargo.status !== 0 || cargo.error) {
+            return undefined;
+        }
+        // TODO: do we need a specific version?
+        const output = cargo.stdout.toString();
+        console.log('cargo lambda version:', output);
+        return true;
+    } catch (err) {
+        return undefined;
+    }
 }
