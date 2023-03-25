@@ -128,6 +128,7 @@ export class RustFunction extends Function {
                 runtime: Settings.RUNTIME,
                 architecture: arch,
                 target,
+                buildEnvironment: props.buildEnvironment,
                 forcedDockerBundling: props.forcedDockerBundling,
             }),
             handler: handler,
